@@ -1,6 +1,7 @@
 import React from 'react';
 import ArticleForm, { ArticleFormData } from './service-components/ArticleForm';
 import './service-components/article-form.css';
+import TextMessageDisplay from '../../../modules/common/components/TextMessageDisplay';
 
 const ArticlePage: React.FC = () => {
   const handleSubmit = async (values: ArticleFormData) => {
@@ -21,7 +22,14 @@ const ArticlePage: React.FC = () => {
           </h3>
         </div>
         <div className="card-body">
+           <TextMessageDisplay 
+            text="Your message text here"
+            timestamp={new Date()} 
+            status="read"
+            direction="rtl"
+          />
           <ArticleForm onSubmit={handleSubmit} mode="add" />
+         
         </div>
       </div>
     </div>

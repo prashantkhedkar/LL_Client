@@ -7,6 +7,7 @@ import { InfoLabels } from '../../../../modules/components/common/formsLabels/de
 import DropdownList from '../../../../modules/components/dropdown/DropdownList';
 import PageHeader from '../../../../modules/components/common/PageHeader/PageHeader';
 import ContentSection from '../../../../modules/components/common/ContentSection/ContentSection';
+import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../../../modules/components/common/formsLabels/detailLabels';
 
 interface ArticleFormProps {
   onSubmit: (values: ArticleFormData) => void;
@@ -20,9 +21,7 @@ export interface ArticleFormData {
   level: string;
   type: string;
   institution: string;
-  faculty: string;
-  discussion: string;
-  conclusion: string;
+  faculty: string; 
   recommendations: string;
   attachments?: File[];
 }
@@ -40,8 +39,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
     type: Yup.string().required('النوع مطلوب'),
     institution: Yup.string().required('المؤسسة مطلوبة'),
     faculty: Yup.string().required('الكلية مطلوبة'),
-    discussion: Yup.string().required('المناقشة مطلوبة'),
-    conclusion: Yup.string().required('الخاتمة مطلوبة'),
+    
     recommendations: Yup.string().required('التواصي مطلوبة'),
   });
 
@@ -52,9 +50,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
       level: '',
       type: '',
       institution: '',
-      faculty: '',
-      discussion: '',
-      conclusion: '',
+      faculty: '', 
       recommendations: '',
       attachments: [],
     },
@@ -174,6 +170,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
               />
             </div>
             <div className="col-md-4">
+              {formik.values.type} ddd
               <DropdownList
                 dataKey="lookupId"
                 dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
@@ -189,39 +186,15 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
           </div>
         </div>
 
-        <div className="col-12 mb-4">
-          <div className="form-group">
-            <ContentSection
-              title="المناقشة"
-              content={formik.values.discussion}
-            />
-            {formik.touched.discussion && formik.errors.discussion && (
-              <div className="error">{formik.errors.discussion}</div>
-            )}
-          </div>
-        </div>
-
-        <div className="col-12 mb-4">
-          <div className="form-group">
-            <ContentSection
-              title="الخاتمة"
-              content={formik.values.conclusion}
-            />
-            {formik.touched.conclusion && formik.errors.conclusion && (
-              <div className="error">{formik.errors.conclusion}</div>
-            )}
-          </div>
-        </div>
+         
 
         <div className="col-12 mb-4">
           <div className="form-group">
             <ContentSection
               title="التواصي"
-              content={formik.values.recommendations}
+              content={"إن المؤسسة العسكرية التي ساهم في بنائها صاحب السمو الشيخ محمد بن زايد آل نهيان رئيس الدولة القائد الأعلى للقوات المسلحة حفظه الله ويسانده أخيه صاحب السمو الشيخ محمد بن راشد آل مكتوم نائب رئيس الدولة رئيس مجلس الوزراء حاكم دبي رعاه الله هي فخر للوطن"}
             />
-            {formik.touched.recommendations && formik.errors.recommendations && (
-              <div className="error">{formik.errors.recommendations}</div>
-            )}
+         
           </div>
         </div>
 
@@ -297,17 +270,24 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
           </div>
         </div>
 
-        <div className="col-12 mt-4">
-          <div className="d-flex justify-content-end gap-3">
-            <button type="button" className="btn btn-secondary" onClick={() => formik.resetForm()}>
-              إلغاء
-            </button>
+        <div className="row">
+          <div className="col-12 d-flex justify-content-end">
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn MOD_btn btn-create w-10 pl-5 mx-3"
               disabled={isLoading || !formik.isValid}
             >
-              {isLoading ? 'جاري الحفظ...' : mode === 'add' ? 'إرسال للاعتماد' : 'حفظ'}
+              <BtnLabeltxtMedium2 
+                text={isLoading ? "BUTTON.LABEL.SAVING" : 
+                  mode === 'add' ? "BUTTON.LABEL.SUBMIT" : "BUTTON.LABEL.UPDATE"} 
+              />
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary mx-3"
+              onClick={() => formik.resetForm()}
+            >
+              <BtnLabelCanceltxtMedium2 text={"BUTTON.LABEL.CANCEL"} />
             </button>
           </div>
         </div>

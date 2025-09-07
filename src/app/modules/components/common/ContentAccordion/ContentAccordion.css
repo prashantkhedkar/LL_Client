@@ -38,11 +38,7 @@
   justify-content: center;
   transition: transform 0.2s ease;
 }
-
-.content-accordion-toggle i {
-  font-size: 0.875rem;
-}
-
+ 
 .content-accordion.expanded .content-accordion-toggle {
   transform: rotate(180deg);
 }
