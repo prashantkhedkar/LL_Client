@@ -284,46 +284,46 @@ function MUIDatePicker({
                 },
               },
             },
-            yearButton: {
-              sx: {
-                fontFamily: "HelveticaNeueLTArabic-Light_0",
-                maxHeight: "230px",
-                ":active": {
-                  backgroundColor:
-                    "var(--date-picker-text-active-color) !important",
-                },
-                ":hover": {
-                  backgroundColor: "var( --date-picker-hover-bg-color)",
-                  borderColor: "transparent",
-                  boxShadow: "none",
-                  color: "var(--date-picker-text-active-color)",
-                },
-                "& .Mui-selected": {
-                  backgroundColor:
-                    "var(--date-picker-text-active-color) !important",
-                  ":hover": {
-                    backgroundColor: "var( --date-picker-hover-bg-color)",
-                    color: "var(--date-picker-text-inverse-color)",
-                  },
-                },
-              },
-            },
-            monthButton: {
-              sx: {
-                fontFamily: "HelveticaNeueLTArabic-Light_0",
-                direction: "rtl",
-                ":active": {
-                  backgroundColor:
-                    "var(--date-picker-text-active-color) !important",
-                },
-                ":hover": {
-                  backgroundColor: "var( --date-picker-hover-bg-color)",
-                  borderColor: "transparent",
-                  boxShadow: "none",
-                  color: "var(--date-picker-text-active-color)",
-                },
-              },
-            },
+            // yearButton: {
+            //   sx: {
+            //     fontFamily: "HelveticaNeueLTArabic-Light_0",
+            //     maxHeight: "230px",
+            //     ":active": {
+            //       backgroundColor:
+            //         "var(--date-picker-text-active-color) !important",
+            //     },
+            //     ":hover": {
+            //       backgroundColor: "var( --date-picker-hover-bg-color)",
+            //       borderColor: "transparent",
+            //       boxShadow: "none",
+            //       color: "var(--date-picker-text-active-color)",
+            //     },
+            //     "& .Mui-selected": {
+            //       backgroundColor:
+            //         "var(--date-picker-text-active-color) !important",
+            //       ":hover": {
+            //         backgroundColor: "var( --date-picker-hover-bg-color)",
+            //         color: "var(--date-picker-text-inverse-color)",
+            //       },
+            //     },
+            //   },
+            // },
+            // monthButton: {
+            //   sx: {
+            //     fontFamily: "HelveticaNeueLTArabic-Light_0",
+            //     direction: "rtl",
+            //     ":active": {
+            //       backgroundColor:
+            //         "var(--date-picker-text-active-color) !important",
+            //     },
+            //     ":hover": {
+            //       backgroundColor: "var( --date-picker-hover-bg-color)",
+            //       borderColor: "transparent",
+            //       boxShadow: "none",
+            //       color: "var(--date-picker-text-active-color)",
+            //     },
+            //   },
+            // },
             textField: {
               size: "small",
               fullWidth: true,

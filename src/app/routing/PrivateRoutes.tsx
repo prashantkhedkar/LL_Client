@@ -19,6 +19,8 @@ import { NewServices } from "../pages/admin/new-services/NewServices";
 import AdminServiceDashboard from "../pages/admin/AdminServiceDashboard";
 import { ServiceRequestEndUserForm } from "../pages/end-user-services/forms/ServiceRequestEndUserForm";
 import ServiceRequestList from "../pages/end-user-services/ServiceRequestList";
+import Dashboard from "../modules/components/Dashboard";
+import ArticlePage from "../pages/admin/new-services/ArticlePage";
 
 const PrivateRoutes = () => {
   const dispatch = useAppDispatch();
@@ -132,8 +134,24 @@ const PrivateRoutes = () => {
     <>
       <AnimatePresence>
         <Routes location={location} key={location.pathname}>
-          <Route path="auth/*" element={<Navigate to="/fms-dashboard" />} />
+          <Route path="auth/*" element={<Navigate to="/dashboard" />} />
+          <Route
+            path="dashboard"
+            element={
+              <SuspensedView>
+                <Dashboard />
+              </SuspensedView>
+            }
+          />
           <Route element={<MasterLayout />}>
+            <Route
+              path="dashboard"
+              element={
+                <SuspensedView>
+                  <Dashboard />
+                </SuspensedView>
+              }
+            />
             <Route
               path="fms-dashboard"
               element={
@@ -261,6 +279,14 @@ const PrivateRoutes = () => {
               element={
                 <SuspensedView>
                   <NotificationListPage />
+                </SuspensedView>
+              }
+            />
+            <Route
+              path="article/new"
+              element={
+                <SuspensedView>
+                  <ArticlePage />
                 </SuspensedView>
               }
             />

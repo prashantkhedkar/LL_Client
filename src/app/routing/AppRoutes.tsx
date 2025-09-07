@@ -20,7 +20,7 @@ const AppRoutes: FC = () => {
             <>
               <Route path="logoutFMS" element={<LogoutRedirection />} />
               <Route path="/*" element={<PrivateRoutes />} />
-              <Route index element={<Navigate to="/fms-dashboard" />} />
+              <Route index element={<Navigate to="/dashboard" />} />
             </>
           ) : (
             <>

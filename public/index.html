@@ -5,11 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Facility Management System" />
+  <meta name="description" content="LessionLearned" />
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" /> -->
-  <title>وزارة الدفاع | التواصل الذكي</title>
+  <title> موسوعة الوثائق التوجيهية لوزارة الدفاع</title>
   <link rel="shortcut icon" href="%PUBLIC_URL%/media/logos/favicon.ico" />
   <link rel="stylesheet" id="layout-styles-anchor" href="%PUBLIC_URL%/splash-screen.css" />
+  
 </head> 
 
 <body id="kt_body" class="page-loading">
@@ -23,7 +24,8 @@
     }
 
     if (themeMode === 'system') {
-      themeMode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'dark' : 'light'
+      //themeMode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'dark' : 'light'
+      themeMode="light"
     }
 
     document.documentElement.setAttribute('data-bs-theme', themeMode)
@@ -34,9 +36,9 @@
 
   <!--begin::Loading markup-->
   <div id="splash-screen" class="splash-screen">
-    <img src="%PUBLIC_URL%/media/logos/mod-spinner.svg" class="dark-logo spinner-svg" alt="dark logo" />
-    <img src="%PUBLIC_URL%/media/logos/mod-spinner.svg" class="light-logo spinner-svg" alt="light logo" />
-    <div class='loader-spinner-text'>...يرجى الإنتظار</div>
+    <!-- <img src="%PUBLIC_URL%/media/logos/default-dark.svg" class="dark-logo" alt="dark logo" /> -->
+    <img src="%PUBLIC_URL%/media/logos/png/favicon.ico" class="light-logo" alt="light logo" />
+    <span>Loading ...</span>
   </div>
   <!--end::Loading markup-->
 
