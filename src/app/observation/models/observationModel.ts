@@ -27,9 +27,7 @@ export interface ArticleCreateUpdateModel {
   conclusion: string;
   initialRecommendation: string;
   type: string;
-  originatingMainUnit: string;
-  originatingSubunit: string;
-  currentAssignment: string;
+  originatingMainUnit: string; 
   status: string;
 }
 
@@ -80,9 +78,7 @@ export const DEFAULT_ARTICLE_FORM: ArticleCreateUpdateModel = {
   conclusion: '',
   initialRecommendation: '',
   type: '',
-  originatingMainUnit: '',
-  originatingSubunit: '',
-  currentAssignment: '',
+  originatingMainUnit: '',  
   status: 'Draft',
 };
 

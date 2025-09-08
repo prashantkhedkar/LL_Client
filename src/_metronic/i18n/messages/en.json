@@ -726,5 +726,13 @@
   "OPTION.SUGGESTION": "Suggestion",
   "OPTION.RISK": "Risk",
   "OPTION.OPPORTUNITY": "Opportunity",
-  "BUTTON.LABEL.SAVING": "Saving..."
+  "BUTTON.LABEL.SAVING": "Saving...",
+  "PLACEHOLDER.OBSERVATION.TITLE": "Enter observation title...",
+  "PLACEHOLDER.OBSERVATION.SUBJECT": "Enter observation subject...",
+  "PLACEHOLDER.DISCUSSION": "Enter discussion details...",
+  "PLACEHOLDER.CONCLUSION": "Enter conclusion...",
+  "PLACEHOLDER.INITIAL.RECOMMENDATION": "Enter initial recommendation...",
+  "PLACEHOLDER.ORIGINATING.MAIN.UNIT": "Enter originating main unit...",
+  "PLACEHOLDER.SELECT.TYPE": "Select Type...",
+  "PLACEHOLDER.SELECT.LEVEL": "Select Level..."
 }

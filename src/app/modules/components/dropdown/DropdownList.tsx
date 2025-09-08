@@ -101,14 +101,23 @@ const DropdownList = (props) => {
       font: 'var(--text-regular-2) !important',
       color: 'var(--text-2) !important'
     }),
-    placeholder: (provided, state) => ({
-      ...provided,
-      color: 'var(--text-2) !important',
-    }),
   };
 
   return (
     <div style={{ width: `${width}px` }}>
+      <style>
+        {`
+          .select__placeholder {
+            color: #666464ff !important; 
+            opacity: 0.7 !important;
+            font: var(--text-regular-2) !important;
+          }
+          .basic-single .select__placeholder {
+            color: #666464ff !important;
+            font: var(--text-regular-2) !important;
+          }
+        `}
+      </style>
       <Select
         isMulti={false}
         autoFocus={focus}
@@ -128,10 +137,7 @@ const DropdownList = (props) => {
               value: value,
               label: selectedText,
             }
-            : {
-              value: value,
-              label: defaultText,
-            }
+            : null
         }
         onMenuOpen={() => {
           if (readOnly) return;

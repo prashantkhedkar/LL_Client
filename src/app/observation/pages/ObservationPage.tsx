@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ObservationForm, { ObservationFormData } from '../components/ObservationForm';
 import '../components/observation-form.css';
 import TextMessageDisplay from '../../modules/common/components/TextMessageDisplay';
@@ -7,10 +7,12 @@ import { ArticleCreateUpdateModel } from '../models/observationModel';
 import { toast } from 'react-toastify';
 import { useIntl } from 'react-intl';
 import { useAppDispatch } from '../../../store';
+import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/components/common/formsLabels/detailLabels';
 
 const ObservationPage: React.FC = () => {
   const intl = useIntl();
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
+  const formikRef = useRef<any>(null);
   const [articleState, articleActions] = useObservation();
 
   const handleSubmit = async (values: ObservationFormData) => {
@@ -23,9 +25,7 @@ const ObservationPage: React.FC = () => {
         conclusion: values.conclusion,
         initialRecommendation: values.initialRecommendation,
         type: values.type,
-        originatingMainUnit: values.originatingMainUnit,
-        originatingSubunit: values.originatingSubunit,
-        currentAssignment: values.currentAssignment,
+        originatingMainUnit: values.originatingMainUnit,  
         status: values.status || 'Draft',
       };
 
@@ -41,6 +41,18 @@ const ObservationPage: React.FC = () => {
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('حدث خطأ أثناء إنشاء المقال');
+    }
+  };
+
+  const handleFormSubmit = () => {
+    if (formikRef.current) {
+      formikRef.current.handleSubmit();
+    }
+  };
+
+  const handleCancel = () => {
+    if (formikRef.current) {
+      formikRef.current.resetForm();
     }
   };
 
@@ -75,8 +87,32 @@ const ObservationPage: React.FC = () => {
           /> */}
           <ObservationForm
             onSubmit={handleSubmit}
-            mode="add"  
+            mode="add"
+            formikRef={formikRef}
           />
+
+          {/* Button Section */}
+          <div className="row" style={{ borderTop: '1px solid #e9ecef', paddingTop: '20px', marginTop: '20px' }}>
+            <div className="col-12 d-flex justify-content-end">
+              <button
+                type="button"
+                className="btn MOD_btn btn-create w-10 pl-5 mx-3"
+                onClick={handleFormSubmit}
+                disabled={articleState.loading || (formikRef.current && !formikRef.current.isValid)}
+              >
+                <BtnLabeltxtMedium2 
+                  text={articleState.loading ? "BUTTON.LABEL.SAVING" : "BUTTON.LABEL.SUBMIT"} 
+                />
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary mx-3"
+                onClick={handleCancel}
+              >
+                <BtnLabelCanceltxtMedium2 text={"BUTTON.LABEL.CANCEL"} />
+              </button>
+            </div>
+          </div>
          
         </div>
       </div>

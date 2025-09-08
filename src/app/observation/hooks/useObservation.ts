@@ -497,9 +497,9 @@ export function useObservation(): [
   };
 
   // Load initial data only once
-  useEffect(() => {
-    loadLookupData();
-  }, [loadLookupData]);
+  // useEffect(() => {
+  //   loadLookupData();
+  // }, [loadLookupData]);
 
   return [state, actions];
 }
