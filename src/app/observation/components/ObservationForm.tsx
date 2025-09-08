@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useIntl } from 'react-intl';
-import { useLang } from '../../../../../_metronic/i18n/Metronici18n';
-import { InfoLabels } from '../../../../modules/components/common/formsLabels/detailLabels';
-import DropdownList from '../../../../modules/components/dropdown/DropdownList';
-import PageHeader from '../../../../modules/components/common/PageHeader/PageHeader';
-import ContentSection from '../../../../modules/components/common/ContentSection/ContentSection';
-import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../../../modules/components/common/formsLabels/detailLabels';
+import { useLang } from '../../../_metronic/i18n/Metronici18n';
+import { InfoLabels } from '../../modules/components/common/formsLabels/detailLabels';
+import DropdownList from '../../modules/components/dropdown/DropdownList';
+import PageHeader from '../../modules/components/common/PageHeader/PageHeader';
+import ContentSection from '../../modules/components/common/ContentSection/ContentSection';
+import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/components/common/formsLabels/detailLabels';
 
-interface ArticleFormProps {
-  onSubmit: (values: ArticleFormData) => void;
-  initialValues?: ArticleFormData;
+interface ObservationFormProps {
+  onSubmit: (values: ObservationFormData) => void;
+  initialValues?: ObservationFormData;
   mode?: 'add' | 'edit';
 }
 
-export interface ArticleFormData {
+export interface ObservationFormData {
   observationSubject: string;
   observationTitle: string;
   discussion: string;
@@ -33,7 +33,7 @@ export interface ArticleFormData {
   attachments?: File[];
 }
 
-const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode = 'add' }) => {
+const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValues, mode = 'add' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const intl = useIntl();
   const lang = useLang();
@@ -352,4 +352,4 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
   );
 };
 
-export default ArticleForm;
+export default ObservationForm;

@@ -1,5 +1,5 @@
-// Base Article Model
-export interface ArticleModel {
+// Base Observation Model
+export interface ObservationModel {
   id: number;
   observationSubject: string;
   observationTitle: string;
@@ -35,7 +35,7 @@ export interface ArticleCreateUpdateModel {
 
 // Article List Model (for paginated responses)
 export interface ArticleListModel {
-  articles: ArticleModel[];
+  articles: ObservationModel[];
   totalCount: number;
   pageNumber: number;
   pageSize: number;

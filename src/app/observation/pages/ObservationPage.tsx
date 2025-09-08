@@ -1,51 +1,21 @@
 import React, { useEffect } from 'react';
-import ArticleForm, { ArticleFormData } from './service-components/ArticleForm';
-import './service-components/article-form.css';
-import TextMessageDisplay from '../../../modules/common/components/TextMessageDisplay';
-import useArticle from '../../../hooks/useArticle';
-import { ArticleCreateUpdateModel } from '../../../models/article/articleModels';
+import ObservationForm, { ObservationFormData } from '../components/ObservationForm';
+import '../components/observation-form.css';
+import TextMessageDisplay from '../../modules/common/components/TextMessageDisplay';
+import useObservation from '../hooks/useObservation';
+import { ArticleCreateUpdateModel } from '../models/observationModel';
 import { toast } from 'react-toastify';
 import { useIntl } from 'react-intl';
-import { useAppDispatch } from '../../../../store';
+import { useAppDispatch } from '../../../store';
 
-const ArticlePage: React.FC = () => {
+const ObservationPage: React.FC = () => {
   const intl = useIntl();
     const dispatch = useAppDispatch();
-  const [articleState, articleActions] = useArticle();
+  const [articleState, articleActions] = useObservation();
 
-   useEffect(() => {
-      
-        // Load Accommodation Types
-        // dispatch(GetLookupValues({ lookupType: "AccommodationType" }))
-        //   .then(unwrapResult)
-        //   .then((originalPromiseResult) => {
-        //     if (originalPromiseResult.statusCode === 200) {
-        //       const response: ILookup[] = originalPromiseResult.data;
-        //       setAccommodationType(response);
-        //     }
-        //   })
-        //   .catch((rejectedValueOrSerializedError) => {
-        //     writeToBrowserConsole(rejectedValueOrSerializedError);
-        //   });
-  
-        // // Load Availability Status options
-        // dispatch(GetLookupValues({ lookupType: "AccommodationStatus" }))
-        //   .then(unwrapResult)
-        //   .then((originalPromiseResult) => {
-        //     if (originalPromiseResult.statusCode === 200) {
-        //       const response: ILookup[] = originalPromiseResult.data;
-        //       setRoomAvailabilityStatus(response);
-        //     }
-        //   })
-        //   .catch((rejectedValueOrSerializedError) => {
-        //     writeToBrowserConsole(rejectedValueOrSerializedError);
-        //   });
-       
-    }, [dispatch]);
-
-  const handleSubmit = async (values: ArticleFormData) => {
+  const handleSubmit = async (values: ObservationFormData) => {
     try {
-      // Convert ArticleFormData to ArticleCreateUpdateModel
+      // Convert ObservationFormData to ArticleCreateUpdateModel
       const data: ArticleCreateUpdateModel = {
         observationSubject: values.observationSubject,
         observationTitle: values.observationTitle,
@@ -66,7 +36,7 @@ const ArticlePage: React.FC = () => {
         console.log('Article created successfully with ID:', result);
       } else {
         toast.error('فشل في إنشاء المقال');
-        console.error('Failed to create article');
+        console.error('Failed to create Observation');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -103,9 +73,9 @@ const ArticlePage: React.FC = () => {
             status="read"
             direction="rtl"
           /> */}
-          <ArticleForm 
-            onSubmit={handleSubmit} 
-            mode="add" 
+          <ObservationForm
+            onSubmit={handleSubmit}
+            mode="add"  
           />
          
         </div>
@@ -114,4 +84,4 @@ const ArticlePage: React.FC = () => {
   );
 };
 
-export default ArticlePage;
+export default ObservationPage;

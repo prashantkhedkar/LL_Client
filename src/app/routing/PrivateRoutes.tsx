@@ -20,7 +20,8 @@ import AdminServiceDashboard from "../pages/admin/AdminServiceDashboard";
 import { ServiceRequestEndUserForm } from "../pages/end-user-services/forms/ServiceRequestEndUserForm";
 import ServiceRequestList from "../pages/end-user-services/ServiceRequestList";
 import Dashboard from "../modules/components/Dashboard";
-import ArticlePage from "../pages/admin/new-services/ArticlePage";
+import ArticlePage from "../observation/pages/ObservationPage";
+import ObservationPage from "../observation/pages/ObservationPage";
 
 const PrivateRoutes = () => {
   const dispatch = useAppDispatch();
@@ -283,10 +284,10 @@ const PrivateRoutes = () => {
               }
             />
             <Route
-              path="article/new"
+              path="observation/new"
               element={
                 <SuspensedView>
-                  <ArticlePage />
+                  <ObservationPage />
                 </SuspensedView>
               }
             />

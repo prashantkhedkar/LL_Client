@@ -1,5 +1,5 @@
 import {
-  ArticleModel,
+  ObservationModel,
   ArticleListModel,
   ArticleSearchModel,
   ArticleCreateUpdateModel,
@@ -11,17 +11,17 @@ import {
   RejectArticleRequest,
   ArchiveArticleRequest,
   ArticleApiResponse,
-} from "../models/article/articleModels";
-import { requests } from "../helper/axiosInterceptor";
-import { responseType } from "../models/global/responseResult";
+} from "../models/observationModel";
+import { requests } from "../../helper/axiosInterceptor";
+import { responseType } from "../../models/global/responseResult";
 
-class ArticleService {
+class ObservationService {
   private baseURL = "/Observation";
 
   // Get articles with search and pagination
   async getArticles(
     searchParams: ArticleSearchModel
-  ): Promise<ArticleApiResponse<ArticleModel[]>> {
+  ): Promise<ArticleApiResponse<ObservationModel[]>> {
     try {
       console.log(
         "🌐 Making API call to articles search with params:",
@@ -43,7 +43,7 @@ class ArticleService {
         const result = {
           success: true,
           message: response.message || "Articles retrieved successfully",
-          data: articlesArray as ArticleModel[],
+          data: articlesArray as ObservationModel[],
           statusCode: response.statusCode,
         };
         console.log("✅ Returning formatted articles response:", result);
@@ -67,7 +67,7 @@ class ArticleService {
     }
   }
 
-  async getAllArticles(): Promise<ArticleApiResponse<ArticleModel[]>> {
+  async getAllArticles(): Promise<ArticleApiResponse<ObservationModel[]>> {
     try {
       const response = await requests.get<responseType>(
         `${this.baseURL}/GetAllArticles`
@@ -84,7 +84,7 @@ class ArticleService {
         const result = {
           success: true,
           message: response.message || "Articles retrieved successfully",
-          data: articlesArray as ArticleModel[],
+          data: articlesArray as ObservationModel[],
           statusCode: response.statusCode,
         };
         console.log("✅ Returning formatted articles response:", result);
@@ -108,10 +108,10 @@ class ArticleService {
     }
   }
 
-  // Get article by ID
+  // Get observation by ID
   async getArticleById(
     articleId: number
-  ): Promise<ArticleApiResponse<ArticleModel>> {
+  ): Promise<ArticleApiResponse<ObservationModel>> {
     try {
       const response = await requests.get<responseType>(
         `${this.baseURL}/GetArticleById/${articleId}`
@@ -121,7 +121,7 @@ class ArticleService {
         return {
           success: true,
           message: response.message || "Article retrieved successfully",
-          data: response.data as any as ArticleModel,
+          data: response.data as any as ObservationModel,
           statusCode: response.statusCode,
         };
       } else {
@@ -132,57 +132,57 @@ class ArticleService {
         };
       }
     } catch (error) {
-      console.error("Error fetching article:", error);
+      console.error("Error fetching observation:", error);
       return {
         success: false,
-        message: "Failed to fetch article",
+        message: "Failed to fetch observation",
         statusCode: 500,
       };
     }
   }
 
-  // Create new article
+  // Create new observation
   async createArticle(
-    article: ArticleCreateUpdateModel
+    observation: ArticleCreateUpdateModel
   ): Promise<ArticleApiResponse<{ articleId: number }>> {
     try {
         debugger;
       const response = await requests.post<
         ArticleApiResponse<{ articleId: number }>
-      >(`${this.baseURL}/Create?submissionStatus=Draft`, article);
+      >(`${this.baseURL}/Create?submissionStatus=Draft`, observation);
       return response;
     } catch (error) {
-      console.error("Error creating article:", error);
+      console.error("Error creating observation:", error);
       return {
         success: false,
-        message: "Failed to create article",
+        message: "Failed to create observation",
         statusCode: 500,
       };
     }
   }
 
-  // Update existing article
+  // Update existing observation
   async updateArticle(
     articleId: number,
-    article: ArticleCreateUpdateModel
+    observation: ArticleCreateUpdateModel
   ): Promise<ArticleApiResponse<void>> {
     try {
       const response = await requests.put<ArticleApiResponse<void>>(
         `${this.baseURL}/${articleId}/UpdateArticle`,
-        article
+        observation
       );
       return response;
     } catch (error) {
-      console.error("Error updating article:", error);
+      console.error("Error updating observation:", error);
       return {
         success: false,
-        message: "Failed to update article",
+        message: "Failed to update observation",
         statusCode: 500,
       };
     }
   }
 
-  // Delete article
+  // Delete observation
   async deleteArticle(
     articleId: number
   ): Promise<ArticleApiResponse<void>> {
@@ -192,16 +192,16 @@ class ArticleService {
       );
       return response;
     } catch (error) {
-      console.error("Error deleting article:", error);
+      console.error("Error deleting observation:", error);
       return {
         success: false,
-        message: "Failed to delete article",
+        message: "Failed to delete observation",
         statusCode: 500,
       };
     }
   }
 
-  // Submit article
+  // Submit observation
   async submitArticle(
     articleId: number,
     notes?: string
@@ -214,16 +214,16 @@ class ArticleService {
       );
       return response;
     } catch (error) {
-      console.error("Error submitting article:", error);
+      console.error("Error submitting observation:", error);
       return {
         success: false,
-        message: "Failed to submit article",
+        message: "Failed to submit observation",
         statusCode: 500,
       };
     }
   }
 
-  // Approve article
+  // Approve observation
   async approveArticle(
     articleId: number,
     notes?: string
@@ -236,16 +236,16 @@ class ArticleService {
       );
       return response;
     } catch (error) {
-      console.error("Error approving article:", error);
+      console.error("Error approving observation:", error);
       return {
         success: false,
-        message: "Failed to approve article",
+        message: "Failed to approve observation",
         statusCode: 500,
       };
     }
   }
 
-  // Reject article
+  // Reject observation
   async rejectArticle(
     articleId: number,
     reason: string,
@@ -259,16 +259,16 @@ class ArticleService {
       );
       return response;
     } catch (error) {
-      console.error("Error rejecting article:", error);
+      console.error("Error rejecting observation:", error);
       return {
         success: false,
-        message: "Failed to reject article",
+        message: "Failed to reject observation",
         statusCode: 500,
       };
     }
   }
 
-  // Archive article
+  // Archive observation
   async archiveArticle(
     articleId: number,
     reason: string
@@ -281,16 +281,16 @@ class ArticleService {
       );
       return response;
     } catch (error) {
-      console.error("Error archiving article:", error);
+      console.error("Error archiving observation:", error);
       return {
         success: false,
-        message: "Failed to archive article",
+        message: "Failed to archive observation",
         statusCode: 500,
       };
     }
   }
 
-  // Get article history
+  // Get observation history
   async getArticleHistory(
     articleId: number
   ): Promise<ArticleApiResponse<ArticleHistoryModel[]>> {
@@ -300,16 +300,16 @@ class ArticleService {
       >(`${this.baseURL}/GetArticlesHistory`);
       return response;
     } catch (error) {
-      console.error("Error fetching article history:", error);
+      console.error("Error fetching observation history:", error);
       return {
         success: false,
-        message: "Failed to fetch article history",
+        message: "Failed to fetch observation history",
         statusCode: 500,
       };
     }
   }
 
-  // Get article statistics
+  // Get observation statistics
   async getArticleStats(): Promise<
     ArticleApiResponse<ArticleStatsModel>
   > {
@@ -319,10 +319,10 @@ class ArticleService {
       >(`${this.baseURL}/GetArticleStats`);
       return response;
     } catch (error) {
-      console.error("Error fetching article stats:", error);
+      console.error("Error fetching observation stats:", error);
       return {
         success: false,
-        message: "Failed to fetch article stats",
+        message: "Failed to fetch observation stats",
         statusCode: 500,
       };
     }
@@ -347,7 +347,7 @@ class ArticleService {
     }
   }
 
-  // Check article title availability
+  // Check observation title availability
   async checkArticleTitleAvailability(
     title: string,
     excludeArticleId?: number
@@ -365,10 +365,10 @@ class ArticleService {
       >(`${this.baseURL}/CheckArticleTitleAvailability?${params.toString()}`);
       return response;
     } catch (error) {
-      console.error("Error checking article title availability:", error);
+      console.error("Error checking observation title availability:", error);
       return {
         success: false,
-        message: "Failed to check article title availability",
+        message: "Failed to check observation title availability",
         statusCode: 500,
       };
     }
@@ -376,5 +376,5 @@ class ArticleService {
 }
 
 // Export singleton instance
-export const articleService = new ArticleService();
-export default articleService;
+export const observationService = new ObservationService();
+export default observationService;

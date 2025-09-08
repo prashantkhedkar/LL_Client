@@ -1,19 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  ArticleModel,
+  ObservationModel,
   ArticleListModel,
   ArticleCreateUpdateModel,
   ArticleSearchModel,
   ArticleStatsModel,
   ArticleLookupModel,
   DEFAULT_ARTICLE_SEARCH,
-} from "../models/article/articleModels";
-import articleService from "../services/articleService";
+} from "../models/observationModel";
+import articleService from "../services/observationService";
 
 interface UseArticleState {
   // Data state
-  articles: ArticleModel[];
-  currentArticle: ArticleModel | null;
+  articles: ObservationModel[];
+  currentArticle: ObservationModel | null;
   stats: ArticleStatsModel | null;
   lookupData: ArticleLookupModel | null;
 
@@ -35,18 +35,18 @@ interface UseArticleState {
   searchParams: ArticleSearchModel;
 }
 
-interface UseArticleActions {
+interface UseObservationActions {
   // Data actions
   loadArticles: (
     params?: Partial<ArticleSearchModel>
   ) => Promise<void>;
-  loadArticleById: (id: number) => Promise<ArticleModel | null>;
+  loadArticleById: (id: number) => Promise<ObservationModel | null>;
   createArticle: (
-    article: ArticleCreateUpdateModel
+    observation: ArticleCreateUpdateModel
   ) => Promise<number | null>;
   updateArticle: (
     id: number,
-    article: ArticleCreateUpdateModel
+    observation: ArticleCreateUpdateModel
   ) => Promise<boolean>;
   deleteArticle: (id: number) => Promise<boolean>;
 
@@ -72,9 +72,9 @@ interface UseArticleActions {
   ) => Promise<boolean>;
 }
 
-export function useArticle(): [
+export function useObservation(): [
   UseArticleState,
-  UseArticleActions
+  UseObservationActions
 ] {
   // State
   const [state, setState] = useState<UseArticleState>({
@@ -160,9 +160,9 @@ export function useArticle(): [
     [updateState]
   ); // Remove state.searchParams dependency to prevent infinite loops
 
-  // Load article by ID
+  // Load observation by ID
   const loadArticleById = useCallback(
-    async (id: number): Promise<ArticleModel | null> => {
+    async (id: number): Promise<ObservationModel | null> => {
       try {
         updateState({ loading: true, error: null });
 
@@ -176,7 +176,7 @@ export function useArticle(): [
           return response.data;
         } else {
           updateState({
-            error: response.message || "Failed to load article",
+            error: response.message || "Failed to load observation",
             loading: false,
           });
           return null;
@@ -192,15 +192,15 @@ export function useArticle(): [
     [updateState]
   );
 
-  // Create article
+  // Create observation
   const createArticle = useCallback(
     async (
-      article: ArticleCreateUpdateModel
+      observation: ArticleCreateUpdateModel
     ): Promise<number | null> => {
       try {
         updateState({ submitting: true, error: null });
 
-        const response = await articleService.createArticle(article);
+        const response = await articleService.createArticle(observation);
         
         if (response.statusCode && response.data) {
           updateState({ submitting: false });
@@ -209,7 +209,7 @@ export function useArticle(): [
           return 1;
         } else {
           updateState({
-            error: response.message || "Failed to create article",
+            error: response.message || "Failed to create observation",
             submitting: false,
           });
           return null;
@@ -225,16 +225,16 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Update article
+  // Update observation
   const updateArticle = useCallback(
     async (
       id: number,
-      article: ArticleCreateUpdateModel
+      observation: ArticleCreateUpdateModel
     ): Promise<boolean> => {
       try {
         updateState({ submitting: true, error: null });
 
-        const response = await articleService.updateArticle(id, article);
+        const response = await articleService.updateArticle(id, observation);
 
         if (response.statusCode && response.data) {
           updateState({ submitting: false });
@@ -243,7 +243,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to update article",
+            error: response.message || "Failed to update observation",
             submitting: false,
           });
           return false;
@@ -259,7 +259,7 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Delete article
+  // Delete observation
   const deleteArticle = useCallback(
     async (id: number): Promise<boolean> => {
       try {
@@ -274,7 +274,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to delete article",
+            error: response.message || "Failed to delete observation",
             deleting: false,
           });
           return false;
@@ -290,7 +290,7 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Submit article
+  // Submit observation
   const submitArticle = useCallback(
     async (id: number, notes?: string): Promise<boolean> => {
       try {
@@ -305,7 +305,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to submit article",
+            error: response.message || "Failed to submit observation",
             submitting: false,
           });
           return false;
@@ -321,7 +321,7 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Approve article
+  // Approve observation
   const approveArticle = useCallback(
     async (id: number, notes?: string): Promise<boolean> => {
       try {
@@ -336,7 +336,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to approve article",
+            error: response.message || "Failed to approve observation",
             submitting: false,
           });
           return false;
@@ -352,7 +352,7 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Reject article
+  // Reject observation
   const rejectArticle = useCallback(
     async (id: number, reason: string, notes?: string): Promise<boolean> => {
       try {
@@ -367,7 +367,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to reject article",
+            error: response.message || "Failed to reject observation",
             submitting: false,
           });
           return false;
@@ -383,7 +383,7 @@ export function useArticle(): [
     [updateState, loadArticles]
   );
 
-  // Archive article
+  // Archive observation
   const archiveArticle = useCallback(
     async (id: number, reason: string): Promise<boolean> => {
       try {
@@ -398,7 +398,7 @@ export function useArticle(): [
           return true;
         } else {
           updateState({
-            error: response.message || "Failed to archive article",
+            error: response.message || "Failed to archive observation",
             submitting: false,
           });
           return false;
@@ -426,7 +426,7 @@ export function useArticle(): [
         console.log("❌ Stats API failed:", response.message);
       }
     } catch (error) {
-      console.error("💥 Failed to load article stats:", error);
+      console.error("💥 Failed to load observation stats:", error);
     }
   }, [updateState]);
 
@@ -443,7 +443,7 @@ export function useArticle(): [
     }
   }, [updateState]);
 
-  // Check article title availability
+  // Check observation title availability
   const checkArticleTitleAvailability = useCallback(
     async (title: string, excludeId?: number): Promise<boolean> => {
       try {
@@ -457,14 +457,14 @@ export function useArticle(): [
         }
         return false;
       } catch (error) {
-        console.error("Failed to check article title availability:", error);
+        console.error("Failed to check observation title availability:", error);
         return false;
       }
     },
     []
   );
 
-  // Reset current article
+  // Reset current observation
   const resetCurrentArticle = useCallback(() => {
     updateState({ currentArticle: null });
   }, [updateState]);
@@ -478,7 +478,7 @@ export function useArticle(): [
   );
 
   // Actions object
-  const actions: UseArticleActions = {
+  const actions: UseObservationActions = {
     loadArticles,
     loadArticleById,
     createArticle,
@@ -504,4 +504,4 @@ export function useArticle(): [
   return [state, actions];
 }
 
-export default useArticle;
+export default useObservation;
