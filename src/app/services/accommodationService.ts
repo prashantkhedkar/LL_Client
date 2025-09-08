@@ -14,7 +14,7 @@ import { requests } from "../helper/axiosInterceptor";
 import { responseType } from "../models/global/responseResult";
 
 class AccommodationService {
-  private baseURL = "/Accommodation";
+  private baseURL = "/Observation";
 
   // Get accommodations with search and pagination
   async getAccommodations(

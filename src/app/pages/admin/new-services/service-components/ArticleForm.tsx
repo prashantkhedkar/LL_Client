@@ -16,13 +16,20 @@ interface ArticleFormProps {
 }
 
 export interface ArticleFormData {
-  title: string;
-  subject: string;
-  level: string;
-  type: string;
-  institution: string;
-  faculty: string; 
-  recommendations: string;
+  observationSubject: string;
+  observationTitle: string;
+  discussion: string;
+  conclusion: string;
+  initialRecommendation: string;
+  type: string; // Issue / Good Practice / Suggestion / Risk / Opportunity
+  originatingMainUnit: string; // System generated
+  originatingSubunit: string;
+  submittedBy: string; // System generated
+  submittedDate: Date; // System generated
+  approvedBy: string; // Auto-assigned
+  currentAssignment: string;
+  status: string; // Draft, Archived, Published
+  submissionStatus: string; // Draft/Submitted
   attachments?: File[];
 }
 
@@ -33,25 +40,48 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
 
 
   const validationSchema = Yup.object({
-    title: Yup.string().required('العنوان مطلوب'),
-    subject: Yup.string().required('الموضوع مطلوب'),
-    level: Yup.string().required('المستوى مطلوب'),
-    type: Yup.string().required('النوع مطلوب'),
-    institution: Yup.string().required('المؤسسة مطلوبة'),
-    faculty: Yup.string().required('الكلية مطلوبة'),
-    
-    recommendations: Yup.string().required('التواصي مطلوبة'),
+    observationTitle: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.OBSERVATION.TITLE.REQUIRED' }))
+      .max(256, intl.formatMessage({ id: 'VALIDATION.OBSERVATION.TITLE.MAX_LENGTH' })),
+    observationSubject: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.OBSERVATION.SUBJECT.REQUIRED' }))
+      .max(256, intl.formatMessage({ id: 'VALIDATION.OBSERVATION.SUBJECT.MAX_LENGTH' })),
+    discussion: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.DISCUSSION.REQUIRED' })),
+    conclusion: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.CONCLUSION.REQUIRED' })),
+    initialRecommendation: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.INITIAL.RECOMMENDATION.REQUIRED' })),
+    type: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.TYPE.REQUIRED' }))
+      .max(64, intl.formatMessage({ id: 'VALIDATION.TYPE.MAX_LENGTH' })),
+    originatingMainUnit: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.ORIGINATING.MAIN.UNIT.REQUIRED' }))
+      .max(128, intl.formatMessage({ id: 'VALIDATION.ORIGINATING.MAIN.UNIT.MAX_LENGTH' })),
+    originatingSubunit: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.ORIGINATING.SUBUNIT.REQUIRED' }))
+      .max(128, intl.formatMessage({ id: 'VALIDATION.ORIGINATING.SUBUNIT.MAX_LENGTH' })),
+    currentAssignment: Yup.string()
+      .required(intl.formatMessage({ id: 'VALIDATION.CURRENT.ASSIGNMENT.REQUIRED' }))
+      .max(128, intl.formatMessage({ id: 'VALIDATION.CURRENT.ASSIGNMENT.MAX_LENGTH' })),
   });
 
   const formik = useFormik({
     initialValues: initialValues || {
-      title: '',
-      subject: '',
-      level: '',
+      observationSubject: '',
+      observationTitle: '',
+      discussion: '',
+      conclusion: '',
+      initialRecommendation: '',
       type: '',
-      institution: '',
-      faculty: '', 
-      recommendations: '',
+      originatingMainUnit: '',
+      originatingSubunit: '',
+      submittedBy: '',
+      submittedDate: new Date(),
+      approvedBy: '',
+      currentAssignment: '',
+      status: '',
+      submissionStatus: '',
       attachments: [],
     },
     validationSchema,
@@ -65,103 +95,139 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
     },
   });
 
-  const levelOptions = [
-    { lookupId: 'beginner', lookupNameAr: 'مبتدئ', lookupName: 'Beginner' },
-    { lookupId: 'intermediate', lookupNameAr: 'متوسط', lookupName: 'Intermediate' },
-    { lookupId: 'advanced', lookupNameAr: 'متقدم', lookupName: 'Advanced' },
-  ];
-
   const typeOptions = [
-    { lookupId: 'article', lookupNameAr: 'مقال', lookupName: 'Article' },
-    { lookupId: 'research', lookupNameAr: 'بحث', lookupName: 'Research' },
-    { lookupId: 'study', lookupNameAr: 'دراسة', lookupName: 'Study' },
+    { lookupId: 'issue', lookupNameAr: intl.formatMessage({ id: 'OPTION.ISSUE' }), lookupName: 'Issue' },
+    { lookupId: 'good-practice', lookupNameAr: intl.formatMessage({ id: 'OPTION.GOOD_PRACTICE' }), lookupName: 'Good Practice' },
+    { lookupId: 'suggestion', lookupNameAr: intl.formatMessage({ id: 'OPTION.SUGGESTION' }), lookupName: 'Suggestion' },
+    { lookupId: 'risk', lookupNameAr: intl.formatMessage({ id: 'OPTION.RISK' }), lookupName: 'Risk' },
+    { lookupId: 'opportunity', lookupNameAr: intl.formatMessage({ id: 'OPTION.OPPORTUNITY' }), lookupName: 'Opportunity' },
   ];
 
   return (
     <form onSubmit={formik.handleSubmit} className="article-form rtl-form">
-      <PageHeader 
-        title={mode === 'add' ? intl.formatMessage({ id: "LABEL.NEW.ARTICLE" }) : intl.formatMessage({ id: "LABEL.EDIT.ARTICLE" })}
-        subject={formik.values.title || intl.formatMessage({ id: "LABEL.ARTICLE.SUBTITLE" })}
-        type={formik.values.type ? typeOptions.find(opt => opt.lookupId === formik.values.type)?.lookupNameAr : undefined}
-        level={formik.values.level ? levelOptions.find(opt => opt.lookupId === formik.values.level)?.lookupNameAr : undefined}
-      />
       <div className="row">
         <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row align-items-center">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.TITLE" })}
+                text={intl.formatMessage({ id: "LABEL.OBSERVATION.TITLE" })}
                 isRequired={true}
               />
             </div>
             <div className="col-md-10">
               <input
                 type="text"
+                autoComplete='off'
+                className="form-control form-control-solid active input5 lbl-txt-medium-2"
+                placeholder={intl.formatMessage({
+                  id: "LABEL.OBSERVATION.TITLE",
+                })}
+                {...formik.getFieldProps('observationTitle')}
+                dir="rtl"
+              />
+              {formik.touched.observationTitle && formik.errors.observationTitle && (
+                <div className="error">{formik.errors.observationTitle}</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 mb-4">
+          <div className="row align-items-center">
+            <div className="col-md-2">
+              <InfoLabels
+                style={{}}
+                text={intl.formatMessage({ id: "LABEL.OBSERVATION.SUBJECT" })}
+                isRequired={true}
+              />
+            </div>
+            <div className="col-md-10">
+              <input
+                type="text"
+                autoComplete='off'
                  className="form-control form-control-solid active input5 lbl-txt-medium-2"
-                          placeholder={intl.formatMessage({
-                            id: "LABEL.TITLE",
-                          })}
-                {...formik.getFieldProps('title')}
+                {...formik.getFieldProps('observationSubject')}
                 dir="rtl"
               />
-              {formik.touched.title && formik.errors.title && (
-                <div className="error">{formik.errors.title}</div>
+              {formik.touched.observationSubject && formik.errors.observationSubject && (
+                <div className="error">{formik.errors.observationSubject}</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.SUBJECT" })}
+                text={intl.formatMessage({ id: "LABEL.DISCUSSION" })}
                 isRequired={true}
               />
             </div>
             <div className="col-md-10">
-              <input
-                type="text"
-                className={`form-control ${formik.touched.subject && formik.errors.subject ? 'is-invalid' : ''}`}
-                {...formik.getFieldProps('subject')}
+              <textarea
+                className="form-control"
+                {...formik.getFieldProps('discussion')}
+                rows={4}
                 dir="rtl"
               />
-              {formik.touched.subject && formik.errors.subject && (
-                <div className="invalid-feedback">{formik.errors.subject}</div>
+              {formik.touched.discussion && formik.errors.discussion && (
+                <div className="error">{formik.errors.discussion}</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.LEVEL" })}
+                text={intl.formatMessage({ id: "LABEL.CONCLUSION" })}
                 isRequired={true}
               />
             </div>
-            <div className="col-md-4">
-              <DropdownList
-                dataKey="lookupId"
-                dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
-                defaultText={intl.formatMessage({ id: "LABEL.SELECT.LEVEL" })}
-                value={formik.values.level}
-                data={levelOptions}
-                setSelectedValue={(value) => formik.setFieldValue('level', value)}
+            <div className="col-md-10">
+              <textarea
+                className="form-control"
+                {...formik.getFieldProps('conclusion')}
+                rows={4}
+                dir="rtl"
               />
-              {formik.touched.level && formik.errors.level && (
-                <div className="error">{formik.errors.level}</div>
+              {formik.touched.conclusion && formik.errors.conclusion && (
+                <div className="error">{formik.errors.conclusion}</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row">
+            <div className="col-md-2">
+              <InfoLabels
+                style={{}}
+                text={intl.formatMessage({ id: "LABEL.INITIAL.RECOMMENDATION" })}
+                isRequired={true}
+              />
+            </div>
+            <div className="col-md-10">
+              <textarea
+                className="form-control"
+                {...formik.getFieldProps('initialRecommendation')}
+                rows={4}
+                dir="rtl"
+              />
+              {formik.touched.initialRecommendation && formik.errors.initialRecommendation && (
+                <div className="error">{formik.errors.initialRecommendation}</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 mb-4">
+          <div className="row align-items-center">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
@@ -170,7 +236,6 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
               />
             </div>
             <div className="col-md-4">
-              {formik.values.type} ddd
               <DropdownList
                 dataKey="lookupId"
                 dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
@@ -186,24 +251,12 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
           </div>
         </div>
 
-         
-
         <div className="col-12 mb-4">
-          <div className="form-group">
-            <ContentSection
-              title="التواصي"
-              content={"إن المؤسسة العسكرية التي ساهم في بنائها صاحب السمو الشيخ محمد بن زايد آل نهيان رئيس الدولة القائد الأعلى للقوات المسلحة حفظه الله ويسانده أخيه صاحب السمو الشيخ محمد بن راشد آل مكتوم نائب رئيس الدولة رئيس مجلس الوزراء حاكم دبي رعاه الله هي فخر للوطن"}
-            />
-         
-          </div>
-        </div>
-
-        <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row align-items-center">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.INSTITUTION" })}
+                text={intl.formatMessage({ id: "LABEL.ORIGINATING.MAIN.UNIT" })}
                 isRequired={true}
               />
             </div>
@@ -211,60 +264,63 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ onSubmit, initialValues, mode
               <input
                 type="text"
                 className="form-control form-control-solid active input5 lbl-txt-medium-2"
-                          placeholder={intl.formatMessage({
-                            id: "LABEL.INSTITUTION",
-                          })}
-                {...formik.getFieldProps('institution')}
+                placeholder={intl.formatMessage({
+                  id: "LABEL.ORIGINATING.MAIN.UNIT",
+                })}
+                {...formik.getFieldProps('originatingMainUnit')}
                 dir="rtl"
+                 
               />
-              {formik.touched.institution && formik.errors.institution && (
-                <div className="error">{formik.errors.institution}</div>
+              {formik.touched.originatingMainUnit && formik.errors.originatingMainUnit && (
+                <div className="error">{formik.errors.originatingMainUnit}</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="col-12 mb-4">
-          <div className="form-group row align-items-center">
+          <div className="row align-items-center">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.FACULTY" })}
+                text={intl.formatMessage({ id: "LABEL.ORIGINATING.SUBUNIT" })}
                 isRequired={true}
               />
             </div>
             <div className="col-md-4">
               <input
                 type="text"
-                className={`form-control ${formik.touched.faculty && formik.errors.faculty ? 'is-invalid' : ''}`}
-                {...formik.getFieldProps('faculty')}
+                autoComplete='off'
+                className={`form-control ${formik.touched.originatingSubunit && formik.errors.originatingSubunit ? 'is-invalid' : ''}`}
+                {...formik.getFieldProps('originatingSubunit')}
                 dir="rtl"
               />
-              {formik.touched.faculty && formik.errors.faculty && (
-                <div className="invalid-feedback">{formik.errors.faculty}</div>
+              {formik.touched.originatingSubunit && formik.errors.originatingSubunit && (
+                <div className="invalid-feedback">{formik.errors.originatingSubunit}</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="col-12 mb-4">
-          <div className="form-group row">
+          <div className="row align-items-center">
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.RECOMMENDATIONS" })}
+                text={intl.formatMessage({ id: "LABEL.CURRENT.ASSIGNMENT" })}
                 isRequired={true}
               />
             </div>
-            <div className="col-md-10">
-              <textarea
-                className="form-control"
-                {...formik.getFieldProps('recommendations')}
-                rows={4}
+            <div className="col-md-4">
+              <input
+                type="text"
+                autoComplete='off'
+                className={`form-control ${formik.touched.currentAssignment && formik.errors.currentAssignment ? 'is-invalid' : ''}`}
+                {...formik.getFieldProps('currentAssignment')}
                 dir="rtl"
               />
-              {formik.touched.recommendations && formik.errors.recommendations && (
-                <div className="error">{formik.errors.recommendations}</div>
+              {formik.touched.currentAssignment && formik.errors.currentAssignment && (
+                <div className="invalid-feedback">{formik.errors.currentAssignment}</div>
               )}
             </div>
           </div>
