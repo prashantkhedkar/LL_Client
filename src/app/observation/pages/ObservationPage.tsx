@@ -83,6 +83,7 @@ const ObservationPage: React.FC = () => {
           )}
 
           {/* <Recommendation observationId={1} /> */}
+          <TextMessageDisplay text={'asdasdasd'}></TextMessageDisplay>
           <ObservationForm
             onSubmit={handleSubmit}
             mode="add"

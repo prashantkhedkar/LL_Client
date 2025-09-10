@@ -62952,8 +62952,8 @@ body::-webkit-scrollbar-thumb {
 
 .completed {
   background: var(--mod-status-completed-lightbackground) !important;
-  border-radius: 4px;
-  padding: 4px 8px;
+  border-radius: 8px;
+  padding: 2px 8px;
   display: flex;
   flex-direction: row;
   gap: 2px;

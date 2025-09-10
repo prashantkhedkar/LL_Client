@@ -312,21 +312,18 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                     <div className="col-md-11">
                     </div>
                     <div className="col-md-1 d-flex justify-content-end align-items-center">
+                        
                         <button
-                            onClick={handleOpen}
-                            className="btn MOD_btn btn-create w-10 pl-5"
-                            id={generateUUID()}
-                        >
-                            <FontAwesomeIcon
-                                icon={faPlus}
-                                size="lg"
-                            ></FontAwesomeIcon>
-                            <BtnLabelCanceltxtMedium2
-                                text={intl.formatMessage({
-                                    id: "BUTTON.LABEL.ADDSTEP",
-                                })}
-                            />
-                        </button>
+                    id="kt_modal_new_target_create_new"
+                    className="btn MOD_btn btn-create w-10 pl-5"
+                    onClick={handleOpen}
+                  >
+                    <FontAwesomeIcon color={""} size="1x" icon={faPlus} />
+                    <BtnLabeltxtMedium2
+                      text={"BUTTON.LABEL.NEWSERVICE"}
+                      isI18nKey={true}
+                    />{" "}
+                  </button>
                     </div>
                 </div>
             </div>
