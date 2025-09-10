@@ -4,12 +4,15 @@ import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 import { globalSlice } from "./app/modules/services/globalSlice";
 import { feedbackSlice } from "./app/modules/services/feedbackSlice";
 import notificationReducer from "./app/modules/services/notificationSlice";
+import recommendationReducer from "./app/modules/services/recommendationSlice";
+
 export const store = configureStore({
   // create and add new slice actions in object which will be exposed to components via the custom hooks useAppDispatch & useAppSelector
   reducer: {
     globalgeneric: globalSlice.reducer,
     feedback: feedbackSlice.reducer,
     notifications: notificationReducer,
+    recommendations: recommendationReducer,
   },
 });
 

@@ -15,9 +15,10 @@ import {
     fetchRecommendationsByObservationId, 
     saveRecommendationForObservation, 
     updateRecommendationForObservation,
-    deleteRecommendationForObservation 
-} from '../../services/globalSlice';
-import { useAppDispatch } from '../../../../store';
+    deleteRecommendationForObservation,
+    clearError
+} from '../../services/recommendationSlice';
+import { useAppDispatch, useAppSelector } from '../../../../store';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useLang } from '../../../../_metronic/i18n/Metronici18n';
 interface RecommendationProps {
@@ -43,14 +44,14 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
     const [discussion, setDiscussion] = useState('');
     const [combotFunction, setCombotFunction] = useState('');
     const [level, setLevel] = useState('');
-    const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
     const [combotFunctionOptions, setCombotFunctionOptions] = useState<ILookup[]>([]);
     const [levelOptions, setLevelOptions] = useState<ILookup[]>([]);
     const [editingRecommendation, setEditingRecommendation] = useState<RecommendationItem | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
+    // Get state from Redux store
+    const { recommendations, loading, error } = useAppSelector((state) => state.recommendations);
+    
     // Validation states
     const [errors, setErrors] = useState({
         title: '',
@@ -86,28 +87,15 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
     const fetchRecommendationsFromAPI = async () => {
         if (!observationId) return;
 
-        setLoading(true);
-        setError(null);
+        dispatch(clearError());
 
         try {
-            const result = await dispatch(fetchRecommendationsByObservationId({ 
+            await dispatch(fetchRecommendationsByObservationId({ 
                 observationId 
-            }));
-            const response = unwrapResult(result);
-            
-            if (response.statusCode === 200) {
-                const fetchedRecommendations = response.data as RecommendationItem[];
-                setRecommendations(fetchedRecommendations || []);
-            } else {
-                setError('Failed to fetch recommendations');
-                console.error('API returned non-200 status:', response.statusCode);
-            }
+            })).unwrap();
         } catch (error) {
-            setError('Error fetching recommendations');
             console.error('Error fetching recommendations:', error);
             writeToBrowserConsole(`Error fetching recommendations for observation ${observationId}: ${error}`);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -310,12 +298,12 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
         // Validate all fields
         if (validateAllFields()) {
-            setLoading(true);
+            dispatch(clearError());
             
             try {
                 if (isEditMode && editingRecommendation) {
                     // Update existing recommendation
-                    const result = await dispatch(updateRecommendationForObservation({
+                    await dispatch(updateRecommendationForObservation({
                         recommendationId: editingRecommendation.id,
                         recommendationData: {
                             title,
@@ -325,33 +313,10 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                             combotFunction,
                             level,
                         }
-                    }));
-                    const response = unwrapResult(result);
-                    
-                    if (response.statusCode === 200) {
-                        // Update local state
-                        setRecommendations(prev => 
-                            prev.map(rec => 
-                                rec.id === editingRecommendation.id 
-                                    ? {
-                                        ...rec,
-                                        title,
-                                        conclusion,
-                                        recommendation: recommendationText,
-                                        discussion,
-                                        combotFunction,
-                                        level,
-                                    }
-                                    : rec
-                            )
-                        );
-                    } else {
-                        console.error('Failed to update recommendation:', response.message);
-                        setError('Failed to update recommendation');
-                    }
+                    })).unwrap();
                 } else {
                     // Add new recommendation
-                    const result = await dispatch(saveRecommendationForObservation({
+                    await dispatch(saveRecommendationForObservation({
                         observationId,
                         recommendationData: {
                             title,
@@ -361,35 +326,13 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                             combotFunction,
                             level,
                         }
-                    }));
-                    const response = unwrapResult(result);
-                    
-                    if (response.statusCode === 200) {
-                        // Add to local state with API response data
-                        const savedRecommendation = response.data || {
-                            id: Date.now(),
-                            observationId,
-                            title,
-                            conclusion,
-                            recommendation: recommendationText,
-                            discussion,
-                            combotFunction,
-                            level,
-                        };
-                        setRecommendations([...recommendations, savedRecommendation]);
-                    } else {
-                        console.error('Failed to save recommendation:', response.message);
-                        setError('Failed to save recommendation');
-                    }
+                    })).unwrap();
                 }
                 
                 handleClose();
             } catch (error) {
                 console.error('Error saving recommendation:', error);
-                setError('Error saving recommendation');
                 writeToBrowserConsole(`Error saving recommendation for observation ${observationId}: ${error}`);
-            } finally {
-                setLoading(false);
             }
         }
     };
@@ -399,29 +342,15 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
             return;
         }
 
-        setLoading(true);
+        dispatch(clearError());
         
         try {
-            const result = await dispatch(deleteRecommendationForObservation({
+            await dispatch(deleteRecommendationForObservation({
                 recommendationId
-            }));
-            const response = unwrapResult(result);
-            
-            if (response.statusCode === 200) {
-                // Remove from local state
-                setRecommendations(prev => 
-                    prev.filter(rec => rec.id !== recommendationId)
-                );
-            } else {
-                console.error('Failed to delete recommendation:', response.message);
-                setError('Failed to delete recommendation');
-            }
+            })).unwrap();
         } catch (error) {
             console.error('Error deleting recommendation:', error);
-            setError('Error deleting recommendation');
             writeToBrowserConsole(`Error deleting recommendation ${recommendationId}: ${error}`);
-        } finally {
-            setLoading(false);
         }
     };
 
