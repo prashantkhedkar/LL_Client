@@ -8,9 +8,12 @@ import { toast } from 'react-toastify';
 import { useIntl } from 'react-intl';
 import { useAppDispatch } from '../../../store';
 import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/components/common/formsLabels/detailLabels';
+import { useAuth } from '../../modules/auth';
+import Recommendation from '../../modules/common/components/Recommendation';
 
 const ObservationPage: React.FC = () => {
   const intl = useIntl();
+    const { auth } = useAuth();
   const dispatch = useAppDispatch();
   const formikRef = useRef<any>(null);
   const [articleState, articleActions] = useObservation();
@@ -79,12 +82,8 @@ const ObservationPage: React.FC = () => {
             </div>
           )}
 
-          {/* <TextMessageDisplay 
-            text="Your message text here"
-            timestamp={new Date()} 
-            status="read"
-            direction="rtl"
-          /> */}
+        
+          {/* <Recommendation observationId={1} /> */}
           <ObservationForm
             onSubmit={handleSubmit}
             mode="add"
