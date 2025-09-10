@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ObservationForm, { ObservationFormData } from '../components/ObservationForm';
-import '../components/observation-form.css';
-import TextMessageDisplay from '../../modules/common/components/TextMessageDisplay';
+import '../components/observation-form.css'; 
 import useObservation from '../hooks/useObservation';
 import { ArticleCreateUpdateModel } from '../models/observationModel';
 import { toast } from 'react-toastify';
@@ -10,6 +9,7 @@ import { useAppDispatch } from '../../../store';
 import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/components/common/formsLabels/detailLabels';
 import { useAuth } from '../../modules/auth';
 import Recommendation from '../../modules/common/components/Recommendation';
+import RecommendationDetails from '../../modules/common/components/RecommendationDetails';
 
 const ObservationPage: React.FC = () => {
   const intl = useIntl();
@@ -83,7 +83,7 @@ const ObservationPage: React.FC = () => {
           )}
 
           {/* <Recommendation observationId={1} /> */}
-          <TextMessageDisplay text={'asdasdasd'}></TextMessageDisplay>
+          {/* <RecommendationDetails text={'asdasdasd'} /> */}
           <ObservationForm
             onSubmit={handleSubmit}
             mode="add"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, TextField, Box, Typography } from '@mui/material';
 import { Col, Modal, Row } from "react-bootstrap";
-import TextMessageDisplay from './TextMessageDisplay';
+import RecommendationDetails from './RecommendationDetails';
 import { generateUUID, writeToBrowserConsole } from '../../utils/common';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,6 +11,12 @@ import { useIntl } from 'react-intl';
 import DropdownList from '../../components/dropdown/DropdownList';
 import { ILookup } from '../../../models/global/globalGeneric';
 import { GetLookupValues } from '../../services/adminSlice';
+import { 
+    fetchRecommendationsByObservationId, 
+    saveRecommendationForObservation, 
+    updateRecommendationForObservation,
+    deleteRecommendationForObservation 
+} from '../../services/globalSlice';
 import { useAppDispatch } from '../../../../store';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useLang } from '../../../../_metronic/i18n/Metronici18n';
@@ -42,6 +48,8 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
     const [levelOptions, setLevelOptions] = useState<ILookup[]>([]);
     const [editingRecommendation, setEditingRecommendation] = useState<RecommendationItem | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Validation states
     const [errors, setErrors] = useState({
@@ -67,6 +75,41 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
     // Debug logging
     console.log('Recommendation component rendered with recommendations:', recommendations.length, recommendations);
+
+    // Fetch recommendations from API when component mounts or observationId changes
+    useEffect(() => {
+        if (observationId) {
+            fetchRecommendationsFromAPI();
+        }
+    }, [observationId]);
+
+    const fetchRecommendationsFromAPI = async () => {
+        if (!observationId) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const result = await dispatch(fetchRecommendationsByObservationId({ 
+                observationId 
+            }));
+            const response = unwrapResult(result);
+            
+            if (response.statusCode === 200) {
+                const fetchedRecommendations = response.data as RecommendationItem[];
+                setRecommendations(fetchedRecommendations || []);
+            } else {
+                setError('Failed to fetch recommendations');
+                console.error('API returned non-200 status:', response.statusCode);
+            }
+        } catch (error) {
+            setError('Error fetching recommendations');
+            console.error('Error fetching recommendations:', error);
+            writeToBrowserConsole(`Error fetching recommendations for observation ${observationId}: ${error}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleOpen = () => {
         setIsEditMode(false);
@@ -254,7 +297,7 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
         }
     }, [dispatch, open]);
 
-    const handleAddRecommendation = () => {
+    const handleAddRecommendation = async () => {
         // Mark all fields as touched
         setTouched({
             title: true,
@@ -267,40 +310,118 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
         // Validate all fields
         if (validateAllFields()) {
-            if (isEditMode && editingRecommendation) {
-                // Update existing recommendation
+            setLoading(true);
+            
+            try {
+                if (isEditMode && editingRecommendation) {
+                    // Update existing recommendation
+                    const result = await dispatch(updateRecommendationForObservation({
+                        recommendationId: editingRecommendation.id,
+                        recommendationData: {
+                            title,
+                            conclusion,
+                            recommendation: recommendationText,
+                            discussion,
+                            combotFunction,
+                            level,
+                        }
+                    }));
+                    const response = unwrapResult(result);
+                    
+                    if (response.statusCode === 200) {
+                        // Update local state
+                        setRecommendations(prev => 
+                            prev.map(rec => 
+                                rec.id === editingRecommendation.id 
+                                    ? {
+                                        ...rec,
+                                        title,
+                                        conclusion,
+                                        recommendation: recommendationText,
+                                        discussion,
+                                        combotFunction,
+                                        level,
+                                    }
+                                    : rec
+                            )
+                        );
+                    } else {
+                        console.error('Failed to update recommendation:', response.message);
+                        setError('Failed to update recommendation');
+                    }
+                } else {
+                    // Add new recommendation
+                    const result = await dispatch(saveRecommendationForObservation({
+                        observationId,
+                        recommendationData: {
+                            title,
+                            conclusion,
+                            recommendation: recommendationText,
+                            discussion,
+                            combotFunction,
+                            level,
+                        }
+                    }));
+                    const response = unwrapResult(result);
+                    
+                    if (response.statusCode === 200) {
+                        // Add to local state with API response data
+                        const savedRecommendation = response.data || {
+                            id: Date.now(),
+                            observationId,
+                            title,
+                            conclusion,
+                            recommendation: recommendationText,
+                            discussion,
+                            combotFunction,
+                            level,
+                        };
+                        setRecommendations([...recommendations, savedRecommendation]);
+                    } else {
+                        console.error('Failed to save recommendation:', response.message);
+                        setError('Failed to save recommendation');
+                    }
+                }
+                
+                handleClose();
+            } catch (error) {
+                console.error('Error saving recommendation:', error);
+                setError('Error saving recommendation');
+                writeToBrowserConsole(`Error saving recommendation for observation ${observationId}: ${error}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleDeleteRecommendation = async (recommendationId: number) => {
+        if (!window.confirm('هل أنت متأكد من حذف هذه التوصية؟')) {
+            return;
+        }
+
+        setLoading(true);
+        
+        try {
+            const result = await dispatch(deleteRecommendationForObservation({
+                recommendationId
+            }));
+            const response = unwrapResult(result);
+            
+            if (response.statusCode === 200) {
+                // Remove from local state
                 setRecommendations(prev => 
-                    prev.map(rec => 
-                        rec.id === editingRecommendation.id 
-                            ? {
-                                ...rec,
-                                title,
-                                conclusion,
-                                recommendation: recommendationText,
-                                discussion,
-                                combotFunction,
-                                level,
-                            }
-                            : rec
-                    )
+                    prev.filter(rec => rec.id !== recommendationId)
                 );
             } else {
-                // Add new recommendation
-                setRecommendations([
-                    ...recommendations,
-                    {
-                        id: Date.now(),
-                        observationId,
-                        title: title,
-                        conclusion: conclusion,
-                        recommendation: recommendationText,
-                        discussion: discussion,
-                        combotFunction: combotFunction,
-                        level: level,
-                    },
-                ]);
+                console.error('Failed to delete recommendation:', response.message);
+                setError('Failed to delete recommendation');
             }
-            handleClose();
+        } catch (error) {
+            console.error('Error deleting recommendation:', error);
+            setError('Error deleting recommendation');
+            writeToBrowserConsole(`Error deleting recommendation ${recommendationId}: ${error}`);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -524,11 +645,12 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                             type="button"
                             className="btn MOD_btn btn-create w-10 pl-5 mx-3"
                             onClick={handleAddRecommendation}
-
+                            disabled={loading}
                         >
                             <BtnLabeltxtMedium2
                                 text={isEditMode ? "BUTTON.LABEL.UPDATE" : "BUTTON.LABEL.SUBMIT"}
                             />
+                            {loading && <span className="spinner-border spinner-border-sm ms-2" role="status"></span>}
                         </button>
                         <button
                             type="button"
@@ -542,13 +664,28 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
                 <Box sx={{ mt: 3 }}>
                     <Typography variant="subtitle1" mb={1}>التوصيات:</Typography>
-                    {recommendations.length === 0 ? (
+                    
+                    {error && (
+                        <Typography variant="body2" color="error" mb={2}>
+                            {error}
+                        </Typography>
+                    )}
+                    
+                    {loading && (
+                        <Box display="flex" justifyContent="center" my={2}>
+                            <div className="spinner-border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </Box>
+                    )}
+                    
+                    {!loading && recommendations.length === 0 ? (
                         <Typography variant="body2" color="text.secondary">لا توجد توصيات بعد.</Typography>
                     ) : (
                         recommendations.map((rec, index) => {
-                            console.log('Rendering TextMessageDisplay for rec:', rec.id, 'with handleEditRecommendation function:', typeof handleEditRecommendation);
+                            console.log('Rendering RecommendationDetails for rec:', rec.id, 'with handleEditRecommendation function:', typeof handleEditRecommendation);
                             return (
-                                <TextMessageDisplay
+                                <RecommendationDetails
                                     key={rec.id}
                                     text={`${rec.title}: ${rec.recommendation}`}
                                     timestamp={new Date()}
@@ -560,6 +697,10 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                                     onEditClick={() => {
                                         console.log('onEditClick called for rec.id:', rec.id);
                                         handleEditRecommendation(rec.id);
+                                    }}
+                                    onDeleteClick={() => {
+                                        console.log('onDeleteClick called for rec.id:', rec.id);
+                                        handleDeleteRecommendation(rec.id);
                                     }}
                                 />
                             );

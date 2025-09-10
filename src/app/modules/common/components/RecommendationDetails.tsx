@@ -34,6 +34,7 @@ interface RecommendationDetailsProps {
   observationId?: string | number
   recommendationId?: number
   onEditClick?: () => void
+  onDeleteClick?: () => void
 }
 
 const RecommendationDetails: React.FC<RecommendationDetailsProps> = ({
@@ -46,6 +47,7 @@ const RecommendationDetails: React.FC<RecommendationDetailsProps> = ({
   observationId = 1,
   recommendationId,
   onEditClick,
+  onDeleteClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const intl = useIntl()
@@ -55,6 +57,7 @@ const RecommendationDetails: React.FC<RecommendationDetailsProps> = ({
   console.log('RecommendationDetails rendered with:', { 
     recommendationId, 
     onEditClick: !!onEditClick,
+    onDeleteClick: !!onDeleteClick,
     text: text.substring(0, 50) + '...'
   });
 
@@ -127,7 +130,10 @@ const RecommendationDetails: React.FC<RecommendationDetailsProps> = ({
             <ClearIcon 
               onClick={(e) => {
                 e.stopPropagation(); // Prevent accordion toggle
-               // handleDeleteClick();
+                console.log('Delete icon clicked in RecommendationDetails', { onDeleteClick, recommendationId });
+                if (onDeleteClick) {
+                  onDeleteClick();
+                }
               }}
               sx={{ 
                 fontSize: 20, 
