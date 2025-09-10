@@ -803,6 +803,52 @@ export const SearchByWildCardText = createAsyncThunk<any, { searchText: string, 
   }
 );
 
+export const fetchActionsByRecommendationId = createAsyncThunk<
+  any,
+  { recommendationId: number | string }
+>(
+  'Generic/GetActionsByRecommendationId',
+  async ({ recommendationId }, thunkApi) => {
+    try {
+      return await requests.get<responseType>(
+        `/Generic/GetActionsByRecommendationId?recommendationId=${recommendationId}`
+      );
+    } catch (error: any) {
+      console.log(error);
+      return thunkApi.rejectWithValue({ error: JSON.stringify(error) });
+    }
+  }
+);
+
+export const saveActionForRecommendation = createAsyncThunk<
+  any,
+  { 
+    recommendationId: number | string,
+    actionData: {
+      id?: number,
+      text: string,
+      status: string,
+      timestamp?: string
+    }
+  }
+>(
+  'Generic/SaveActionForRecommendation',
+  async ({ recommendationId, actionData }, thunkApi) => {
+    try {
+      return await requests.post<responseType>(
+        `/Generic/SaveActionForRecommendation`,
+        {
+          recommendationId,
+          ...actionData
+        }
+      );
+    } catch (error: any) {
+      console.log(error);
+      return thunkApi.rejectWithValue({ error: JSON.stringify(error) });
+    }
+  }
+);
+
 
 
 // Create Redux Slice

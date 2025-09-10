@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Button,
     Typography,
@@ -24,10 +24,13 @@ import { useLang } from "../../../../_metronic/i18n/Metronici18n"
 import { BtnLabelCanceltxtMedium2, HeaderLabels, LabelTextSemibold2 } from '../../components/common/formsLabels/detailLabels'
 import DropdownList from "../../components/dropdown/DropdownList"
 import './ActionsDisplay.css'
-import { generateUUID } from '../../utils/common'
+import { generateUUID, writeToBrowserConsole } from '../../utils/common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
+import { useAppDispatch } from '../../../../store'
+import { fetchActionsByRecommendationId, saveActionForRecommendation } from '../../services/globalSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 interface Action {
     id: number
@@ -37,23 +40,20 @@ interface Action {
 }
 
 interface ActionsDisplayProps {
-    actions?: Action[]
-    onAddAction?: () => void
-    onEditAction?: (actionId: number) => void
-    onDeleteAction?: (actionId: number) => void
+    recommendationId?: number | string
 }
 
 const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
-    actions = [],
-    onAddAction,
-    onEditAction,
-    onDeleteAction
+    recommendationId
 }) => {
     const lang = useLang()
+    const dispatch = useAppDispatch()
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [selectedStatus, setSelectedStatus] = useState('')
     const [selectedReason, setSelectedReason] = useState('')
     const [editingActionId, setEditingActionId] = useState<number | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     // Status options for dropdown
     const statusOptions = [
@@ -62,14 +62,52 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
         { lookupId: '3', lookupNameAr: 'ملغي', lookupName: 'Cancelled' }
     ]
 
-    const [actionsList, setActionsList] = useState<Action[]>(actions.length > 0 ? actions : [
-        {
-            id: 1,
-            text: "إن المؤسسة العسكرية التي ساهم في بنائها صاحب السمو الشيخ محمد بن زايد آل نهيان رئيس الدولة القائد الأعلى للقوات المسلحة حفظه الله وساندها أخيه صاحب السمو الشيخ محمد بن راشد آل مكتوم نائب",
-            timestamp: "2025/02/20",
-            status: "completed"
+    const [actionsList, setActionsList] = useState<Action[]>([])
+
+    // Fetch actions based on recommendationId when component mounts or recommendationId changes
+    useEffect(() => {
+        if (recommendationId) {
+            fetchActionsFromAPI()
+        } else {
+            // Default sample data if no recommendationId provided
+            setActionsList([
+                {
+                    id: 1,
+                    text: "إن المؤسسة العسكرية التي ساهم في بنائها صاحب السمو الشيخ محمد بن زايد آل نهيان رئيس الدولة القائد الأعلى للقوات المسلحة حفظه الله وساندها أخيه صاحب السمو الشيخ محمد بن راشد آل مكتوم نائب",
+                    timestamp: "2025/02/20",
+                    status: "completed"
+                }
+            ])
         }
-    ])
+    }, [recommendationId])
+
+    const fetchActionsFromAPI = async () => {
+        if (!recommendationId) return
+
+        setLoading(true)
+        setError(null)
+
+        try {
+            const result = await dispatch(fetchActionsByRecommendationId({ 
+                recommendationId 
+            }))
+            const response = unwrapResult(result)
+            
+            if (response.statusCode === 200) {
+                const fetchedActions = response.data as Action[]
+                setActionsList(fetchedActions || [])
+            } else {
+                setError('Failed to fetch actions')
+                console.error('API returned non-200 status:', response.statusCode)
+            }
+        } catch (error) {
+            setError('Error fetching actions')
+            console.error('Error fetching actions:', error)
+            writeToBrowserConsole(`Error fetching actions for recommendation ${recommendationId}: ${error}`)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const handleAddAction = () => {
         setEditingActionId(null) // null means we're adding, not editing
@@ -87,9 +125,6 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
             setSelectedReason('') // Load existing reason if you have it
         }
         setIsEditModalOpen(true)
-        if (onEditAction) {
-            onEditAction(actionId)
-        }
     }
 
     const handleCloseModal = () => {
@@ -99,7 +134,7 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
         setEditingActionId(null)
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (editingActionId === null) {
             // Adding new action
             const newAction: Action = {
@@ -108,26 +143,82 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
                 timestamp: new Date().toISOString().split('T')[0].replace(/-/g, '/'),
                 status: selectedStatus as 'completed' | 'pending' | 'cancelled' || 'pending'
             }
-            setActionsList([...actionsList, newAction])
-            if (onAddAction) {
-                onAddAction()
+
+            // Save to API if recommendationId is provided
+            if (recommendationId) {
+                try {
+                    const result = await dispatch(saveActionForRecommendation({
+                        recommendationId,
+                        actionData: {
+                            text: newAction.text,
+                            status: newAction.status || 'pending',
+                            timestamp: newAction.timestamp
+                        }
+                    }))
+                    const response = unwrapResult(result)
+                    
+                    if (response.statusCode === 200) {
+                        // Update local state with response data if available, or use new action
+                        const savedAction = response.data || newAction
+                        setActionsList([...actionsList, savedAction])
+                    } else {
+                        console.error('Failed to save action:', response.message)
+                        // Fallback to local state update
+                        setActionsList([...actionsList, newAction])
+                    }
+                } catch (error) {
+                    console.error('Error saving action:', error)
+                    writeToBrowserConsole(`Error saving action for recommendation ${recommendationId}: ${error}`)
+                    // Fallback to local state update
+                    setActionsList([...actionsList, newAction])
+                }
+            } else {
+                // Update local state only
+                setActionsList([...actionsList, newAction])
             }
         } else {
             // Editing existing action
-            setActionsList(actionsList.map(action => 
-                action.id === editingActionId 
-                    ? { ...action, status: selectedStatus as 'completed' | 'pending' | 'cancelled' || action.status }
-                    : action
-            ))
+            const updatedAction = actionsList.find(action => action.id === editingActionId)
+            if (updatedAction && recommendationId) {
+                try {
+                    const result = await dispatch(saveActionForRecommendation({
+                        recommendationId,
+                        actionData: {
+                            id: editingActionId,
+                            text: updatedAction.text,
+                            status: selectedStatus as 'completed' | 'pending' | 'cancelled' || updatedAction.status || 'pending'
+                        }
+                    }))
+                    const response = unwrapResult(result)
+                    
+                    if (response.statusCode === 200) {
+                        // Update local state
+                        setActionsList(actionsList.map(action => 
+                            action.id === editingActionId 
+                                ? { ...action, status: selectedStatus as 'completed' | 'pending' | 'cancelled' || action.status }
+                                : action
+                        ))
+                    } else {
+                        console.error('Failed to update action:', response.message)
+                    }
+                } catch (error) {
+                    console.error('Error updating action:', error)
+                    writeToBrowserConsole(`Error updating action for recommendation ${recommendationId}: ${error}`)
+                }
+            } else {
+                // Update local state only
+                setActionsList(actionsList.map(action => 
+                    action.id === editingActionId 
+                        ? { ...action, status: selectedStatus as 'completed' | 'pending' | 'cancelled' || action.status }
+                        : action
+                ))
+            }
         }
         handleCloseModal()
     }
 
     const handleDeleteAction = (actionId: number) => {
         setActionsList(actionsList.filter(action => action.id !== actionId))
-        if (onDeleteAction) {
-            onDeleteAction(actionId)
-        }
     }
 
     const getStatusIcon = (status: string) => {
@@ -160,11 +251,34 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
     return (
         <>
         <Box className="actions-display-container">
-            
+            {/* Loading State */}
+            {loading && (
+                <Box className="loading-state" sx={{ textAlign: 'center', py: 3 }}>
+                    <Typography variant="body1">جاري تحميل الإجراءات...</Typography>
+                </Box>
+            )}
+
+            {/* Error State */}
+            {error && (
+                <Box className="error-state" sx={{ textAlign: 'center', py: 3 }}>
+                    <Typography variant="body1" color="error">
+                        {error}
+                    </Typography>
+                    <Button 
+                        onClick={fetchActionsFromAPI} 
+                        variant="outlined" 
+                        size="small" 
+                        sx={{ mt: 1 }}
+                    >
+                        إعادة المحاولة
+                    </Button>
+                </Box>
+            )}
 
             {/* Actions List */}
-            <Box className="actions-list">
-                {actionsList.map((action, index) => (
+            {!loading && !error && (
+                <Box className="actions-list">
+                    {actionsList.map((action, index) => (
                     <Card
                         key={action.id}
                         className="action-card"
@@ -272,10 +386,11 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
                         </CardContent>
                     </Card>
                 ))}
-            </Box>
+                </Box>
+            )}
 
             {/* Add Action Button - Show after all actions or in empty state */}
-            {actionsList.length > 0 && (
+            {!loading && !error && actionsList.length > 0 && (
                 <Box className="add-action-container">
                      
                     <button
@@ -296,7 +411,7 @@ const ActionsDisplay: React.FC<ActionsDisplayProps> = ({
             )}
 
             {/* Empty State */}
-            {actionsList.length === 0 && (
+            {!loading && !error && actionsList.length === 0 && (
                 <Box className="empty-state">
                     <Typography variant="body1" className="empty-state-text">
                         لا توجد إجراءات متاحة

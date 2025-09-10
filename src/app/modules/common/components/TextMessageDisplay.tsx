@@ -144,14 +144,14 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
         <div className="p-4">
           
         
-          {/* Actions Display Component */}
-          <div className="mb-4">
-            <ActionsDisplay 
-              onAddAction={() => console.log('Add action clicked')}
-              onEditAction={(actionId) => console.log('Edit action:', actionId)}
-              onDeleteAction={(actionId) => console.log('Delete action:', actionId)}
-            />
-          </div>
+          {/* Actions Display Component - Only render when accordion is expanded */}
+          {isExpanded && (
+            <div className="mb-4">
+              <ActionsDisplay 
+                recommendationId={recommendationId}
+              />
+            </div>
+          )}
          
           
         </div>
