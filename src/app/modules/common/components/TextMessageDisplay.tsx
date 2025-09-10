@@ -24,6 +24,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { HeaderLabels } from '../../components/common/formsLabels/detailLabels'
 import DropdownList from "../../components/dropdown/DropdownList"
 
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 interface TextMessageDisplayProps {
   text: string
   timestamp?: string | Date
@@ -122,6 +123,31 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
       >
         <div className="w-100 d-flex justify-content-between align-items-center">
           <h3 className="fw-bold m-0 text-gray-800">{`الجزء ${index}`}www</h3>
+          <div className="d-flex align-items-center me-3" style={{ gap: '15px', borderLeft: '1px solid #E2E2E2',paddingLeft: '10px' }}>
+            <EditOutlinedIcon 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent accordion toggle
+               // handleEditClick();
+              }}
+              sx={{ 
+                fontSize: 20, 
+               
+                cursor: 'pointer',
+                '&:hover': { color: 'primary.main' }
+              }} 
+            />
+            <DeleteOutlineIcon 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent accordion toggle
+               // handleDeleteClick();
+              }}
+              sx={{ 
+                fontSize: 20, 
+                cursor: 'pointer',
+                '&:hover': { color: 'error.main' }
+              }} 
+            />
+          </div>
         </div>
       </AccordionSummary>
 
