@@ -40,6 +40,8 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
     const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
     const [combotFunctionOptions, setCombotFunctionOptions] = useState<ILookup[]>([]);
     const [levelOptions, setLevelOptions] = useState<ILookup[]>([]);
+    const [editingRecommendation, setEditingRecommendation] = useState<RecommendationItem | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     // Validation states
     const [errors, setErrors] = useState({
@@ -63,10 +65,36 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
     const lang = useLang();
     const dispatch = useAppDispatch();
 
-    const handleOpen = () => setOpen(true);
+    // Debug logging
+    console.log('Recommendation component rendered with recommendations:', recommendations.length, recommendations);
+
+    const handleOpen = () => {
+        setIsEditMode(false);
+        setEditingRecommendation(null);
+        setOpen(true);
+    };
+
+    const handleEditRecommendation = (recommendationId: number) => {
+        console.log('Edit clicked for recommendation ID:', recommendationId);
+        const recommendation = recommendations.find(rec => rec.id === recommendationId);
+        if (recommendation) {
+            console.log('Found recommendation:', recommendation);
+            setIsEditMode(true);
+            setEditingRecommendation(recommendation);
+            setTitle(recommendation.title);
+            setConclusion(recommendation.conclusion);
+            setRecommendationText(recommendation.recommendation);
+            setDiscussion(recommendation.discussion);
+            setCombotFunction(recommendation.combotFunction);
+            setLevel(recommendation.level);
+            setOpen(true);
+        }
+    };
 
     const handleClose = () => {
         setOpen(false);
+        setIsEditMode(false);
+        setEditingRecommendation(null);
         setTitle('');
         setConclusion('');
         setRecommendationText('');
@@ -239,25 +267,46 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
         // Validate all fields
         if (validateAllFields()) {
-            setRecommendations([
-                ...recommendations,
-                {
-                    id: Date.now(),
-                    observationId,
-                    title: title,
-                    conclusion: conclusion,
-                    recommendation: recommendationText,
-                    discussion: discussion,
-                    combotFunction: combotFunction,
-                    level: level,
-                },
-            ]);
+            if (isEditMode && editingRecommendation) {
+                // Update existing recommendation
+                setRecommendations(prev => 
+                    prev.map(rec => 
+                        rec.id === editingRecommendation.id 
+                            ? {
+                                ...rec,
+                                title,
+                                conclusion,
+                                recommendation: recommendationText,
+                                discussion,
+                                combotFunction,
+                                level,
+                            }
+                            : rec
+                    )
+                );
+            } else {
+                // Add new recommendation
+                setRecommendations([
+                    ...recommendations,
+                    {
+                        id: Date.now(),
+                        observationId,
+                        title: title,
+                        conclusion: conclusion,
+                        recommendation: recommendationText,
+                        discussion: discussion,
+                        combotFunction: combotFunction,
+                        level: level,
+                    },
+                ]);
+            }
             handleClose();
         }
     };
 
     return (
         <>
+            {console.log('Current recommendations array:', recommendations)}
             <div className="">
                 <div className="row g-0">
                     <div className="col-md-11">
@@ -302,7 +351,7 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                         <Modal.Title>
                             <HeaderLabels
                                 text={
-                                    " إضافة توصية جديدة"
+                                    isEditMode ? "تعديل التوصية" : " إضافة توصية جديدة"
                                 }
                             />
                         </Modal.Title>
@@ -481,7 +530,7 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
                         >
                             <BtnLabeltxtMedium2
-                                text={"BUTTON.LABEL.SUBMIT"}
+                                text={isEditMode ? "BUTTON.LABEL.UPDATE" : "BUTTON.LABEL.SUBMIT"}
                             />
                         </button>
                         <button
@@ -499,16 +548,25 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                     {recommendations.length === 0 ? (
                         <Typography variant="body2" color="text.secondary">لا توجد توصيات بعد.</Typography>
                     ) : (
-                        recommendations.map(rec => (
-                            <TextMessageDisplay
-                                key={rec.id}
-                                text={`${rec.title}: ${rec.recommendation}`}
-                                timestamp={new Date()}
-                                status="read"
-                                direction="rtl"
-                                observationId={rec.observationId}
-                            />
-                        ))
+                        recommendations.map((rec, index) => {
+                            console.log('Rendering TextMessageDisplay for rec:', rec.id, 'with handleEditRecommendation function:', typeof handleEditRecommendation);
+                            return (
+                                <TextMessageDisplay
+                                    key={rec.id}
+                                    text={`${rec.title}: ${rec.recommendation}`}
+                                    timestamp={new Date()}
+                                    status="read"
+                                    direction="rtl"
+                                    observationId={rec.observationId}
+                                    index={index + 1}
+                                    recommendationId={rec.id}
+                                    onEditClick={() => {
+                                        console.log('onEditClick called for rec.id:', rec.id);
+                                        handleEditRecommendation(rec.id);
+                                    }}
+                                />
+                            );
+                        })
                     )}
                 </Box>
             </Box>

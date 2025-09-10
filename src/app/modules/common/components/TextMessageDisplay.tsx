@@ -33,6 +33,8 @@ interface TextMessageDisplayProps {
   className?: string
   index?: number
   observationId?: string | number
+  recommendationId?: number
+  onEditClick?: () => void
 }
 
 const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
@@ -43,6 +45,8 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
   className = '',
   index = 1,
   observationId = 1,
+  recommendationId,
+  onEditClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -50,6 +54,13 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
   const [selectedReason, setSelectedReason] = useState('')
   const intl = useIntl()
   const lang = useLang()
+
+  // Debug logging
+  console.log('TextMessageDisplay rendered with:', { 
+    recommendationId, 
+    onEditClick: !!onEditClick,
+    text: text.substring(0, 50) + '...'
+  });
 
   // Status options for dropdown
   const statusOptions = [
@@ -127,7 +138,10 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
             <EditOutlinedIcon 
               onClick={(e) => {
                 e.stopPropagation(); // Prevent accordion toggle
-               // handleEditClick();
+                console.log('Edit icon clicked in TextMessageDisplay', { onEditClick, recommendationId });
+                if (onEditClick) {
+                  onEditClick();
+                }
               }}
               sx={{ 
                 fontSize: 20, 
@@ -180,7 +194,7 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
                   }} 
                 />
                 <EditOutlinedIcon 
-                  onClick={handleEditClick}
+                 onClick={handleEditClick}
                   sx={{ 
                     fontSize: 20, 
                     color: 'text.secondary',

@@ -82,7 +82,6 @@ const ObservationPage: React.FC = () => {
             </div>
           )}
 
-        
           {/* <Recommendation observationId={1} /> */}
           <ObservationForm
             onSubmit={handleSubmit}
