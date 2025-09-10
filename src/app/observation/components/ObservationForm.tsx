@@ -50,7 +50,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
   useEffect(() => {
         auth && console.log("Current User in ObservationForm: ", auth);
       // Load Observation Types
-      dispatch(GetLookupValues({ lookupType: "Actions" }))
+      dispatch(GetLookupValues({ lookupType: "ObservationType" }))
         .then(unwrapResult)
         .then((originalPromiseResult) => {
           if (originalPromiseResult.statusCode === 200) {
@@ -63,7 +63,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
         });
 
       // Load Observation Level options
-      dispatch(GetLookupValues({ lookupType: "NotificationType" }))
+      dispatch(GetLookupValues({ lookupType: "Level" }))
         .then(unwrapResult)
         .then((originalPromiseResult) => {
           if (originalPromiseResult.statusCode === 200) {
