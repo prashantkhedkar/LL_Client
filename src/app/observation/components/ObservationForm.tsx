@@ -13,6 +13,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { ILookup } from '../../models/global/globalGeneric';
 import { GetLookupValues } from '../../modules/services/adminSlice';
 import { useAppDispatch } from '../../../store';
+import { useAuth } from '../../modules/auth';
 
 interface ObservationFormProps {
   onSubmit: (values: ObservationFormData) => void;
@@ -45,9 +46,9 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
   const intl = useIntl();
   const lang = useLang();
   const dispatch = useAppDispatch();
-
+ const { auth } = useAuth();
   useEffect(() => {
-    
+        auth && console.log("Current User in ObservationForm: ", auth);
       // Load Observation Types
       dispatch(GetLookupValues({ lookupType: "Actions" }))
         .then(unwrapResult)

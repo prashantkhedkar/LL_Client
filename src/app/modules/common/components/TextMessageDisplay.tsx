@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Recommendation from './Recommendation'
 import dayjs from 'dayjs'
 import {KTSVG} from '../../../../_metronic/helpers'
 import { 
@@ -30,6 +31,7 @@ interface TextMessageDisplayProps {
   direction?: 'rtl' | 'ltr'
   className?: string
   index?: number
+  observationId?: string | number
 }
 
 const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
@@ -39,8 +41,9 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
   direction = 'rtl',
   className = '',
   index = 1,
+  observationId = 1,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState('')
   const [selectedReason, setSelectedReason] = useState('')
@@ -128,12 +131,11 @@ const TextMessageDisplay: React.FC<TextMessageDisplayProps> = ({
           <div className="fs-4 fw-normal text-gray-800 mb-5 text-right">
             {text}
           </div>
-          
+         
           {/* Footer with three sections */}
           <div className="d-flex justify-content-between align-items-center border-top" 
                style={{ 
                  padding: '12px 16px', 
-                
                  borderTop: '1px solid #E4E6EF' 
                }}>
             {/* First section - By and Action Icons */}
