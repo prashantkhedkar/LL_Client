@@ -173,7 +173,7 @@ export const GetLookupValues = createAsyncThunk<any, { lookupType?: string }>(
   async ({ lookupType }, thunkApi) => {
     try {
       return await requests.get<responseType>(
-        `/Admin/GetLookupValues?lookupType=${lookupType}`
+        `/MasterData/GetMasterLookups?lookupType=${lookupType}`
       );
     } catch (error: any) {
       console.log(error);

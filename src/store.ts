@@ -5,6 +5,7 @@ import { globalSlice } from "./app/modules/services/globalSlice";
 import { feedbackSlice } from "./app/modules/services/feedbackSlice";
 import notificationReducer from "./app/modules/services/notificationSlice";
 import recommendationReducer from "./app/modules/services/recommendationSlice";
+import observationReducer from "./app/modules/services/observationSlice";
 
 export const store = configureStore({
   // create and add new slice actions in object which will be exposed to components via the custom hooks useAppDispatch & useAppSelector
@@ -12,6 +13,7 @@ export const store = configureStore({
     globalgeneric: globalSlice.reducer,
     feedback: feedbackSlice.reducer,
     notifications: notificationReducer,
+    observations: observationReducer,
     recommendations: recommendationReducer,
   },
 });

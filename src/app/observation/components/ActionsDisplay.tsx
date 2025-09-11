@@ -9,7 +9,7 @@ import {
     Divider
 } from '@mui/material'
 import { Modal, Row, Col } from "react-bootstrap"
-import { GlobalLabel } from "../../components/common/label/LabelCategory"
+import { GlobalLabel } from "../../modules/components/common/label/LabelCategory"
 import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -20,16 +20,16 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import PersonIcon from '@mui/icons-material/Person'
 import EditIcon from '@mui/icons-material/Edit'
-import { useLang } from "../../../../_metronic/i18n/Metronici18n"
-import { BtnLabelCanceltxtMedium2, HeaderLabels, LabelTextSemibold2 } from '../../components/common/formsLabels/detailLabels'
-import DropdownList from "../../components/dropdown/DropdownList"
+import { useLang } from "../../../_metronic/i18n/Metronici18n"
+import { BtnLabelCanceltxtMedium2, HeaderLabels, LabelTextSemibold2 } from '../../modules/components/common/formsLabels/detailLabels'
+import DropdownList from "../../modules/components/dropdown/DropdownList"
 import './ActionsDisplay.css'
-import { generateUUID, writeToBrowserConsole } from '../../utils/common'
+import { generateUUID, writeToBrowserConsole } from '../../modules/utils/common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
-import { useAppDispatch } from '../../../../store'
-import { fetchActionsByRecommendationId, saveActionForRecommendation } from '../../services/globalSlice'
+import { useAppDispatch } from '../../../store'
+import { fetchActionsByRecommendationId, saveActionForRecommendation } from '../../modules/services/globalSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 
 interface Action {

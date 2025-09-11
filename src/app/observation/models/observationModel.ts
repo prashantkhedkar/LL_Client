@@ -1,18 +1,17 @@
 // Base Observation Model
 export interface ObservationModel {
   id: number;
-  observationSubject: string;
   observationTitle: string;
-  discussion: string;
-  conclusion: string;
-  initialRecommendation: string;
-  type: string;
-  originatingMainUnit: string;
-  originatingSubunit: string;
+  discussion?: string;
+  conclusion?: string;
+  initialRecommendation?: string;
+  observationType?: number;
+  originatingType?: number;
+  level?: number;
   submittedBy?: string;
   submittedDate?: Date;
   approvedBy?: string;
-  currentAssignment: string;
+  currentAssignment?: string;
   status: string;
   submissionStatus?: string;
   createdAt?: Date;
@@ -21,14 +20,15 @@ export interface ObservationModel {
 
 // Article Create/Update Model (for API requests)
 export interface ArticleCreateUpdateModel {
-  observationSubject: string;
   observationTitle: string;
-  discussion: string;
-  conclusion: string;
-  initialRecommendation: string;
-  type: string;
-  originatingMainUnit: string; 
-  status: string;
+  discussion?: string;
+  conclusion?: string;
+  initialRecommendation?: string;
+  observationType?: number;
+  originatingType?: number;
+  level?: number;
+  currentAssignment?: string;
+  status: number;
 }
 
 // Article List Model (for paginated responses)
@@ -43,11 +43,10 @@ export interface ArticleListModel {
 // Article Search Model
 export interface ArticleSearchModel {
   searchTerm?: string;
-  type?: string;
+  observationType?: number;
   status?: string;
-  originatingMainUnit?: string;
-  originatingSubunit?: string;
   currentAssignment?: string;
+  level?: number;
   dateFrom?: Date;
   dateTo?: Date;
   pageNumber?: number;
@@ -59,11 +58,10 @@ export interface ArticleSearchModel {
 // Default search parameters
 export const DEFAULT_ARTICLE_SEARCH: ArticleSearchModel = {
   searchTerm: '',
-  type: '',
+  observationType: undefined,
   status: '',
-  originatingMainUnit: '',
-  originatingSubunit: '',
   currentAssignment: '',
+  level: undefined,
   pageNumber: 1,
   pageSize: 10,
   sortBy: 'createdAt',
@@ -72,14 +70,15 @@ export const DEFAULT_ARTICLE_SEARCH: ArticleSearchModel = {
 
 // Default form values
 export const DEFAULT_ARTICLE_FORM: ArticleCreateUpdateModel = {
-  observationSubject: '',
   observationTitle: '',
   discussion: '',
   conclusion: '',
   initialRecommendation: '',
-  type: '',
-  originatingMainUnit: '',  
-  status: 'Draft',
+  observationType: 0,
+  originatingType: 0,
+  level: 0,
+  currentAssignment: '',
+  status: 12,
 };
 
 // Article History Model
