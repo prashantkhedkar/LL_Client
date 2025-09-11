@@ -10,6 +10,7 @@ import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/comp
 import { useAuth } from '../../modules/auth';
 import Recommendation from '../../modules/common/components/Recommendation';
 import RecommendationDetails from '../../modules/common/components/RecommendationDetails';
+ import { ObservationSteppers } from '../components/ObervationSteppers';
 
 const ObservationPage: React.FC = () => {
   const intl = useIntl();
@@ -61,6 +62,7 @@ const ObservationPage: React.FC = () => {
 
   return (
     <div className="container-fluid">
+       <ObservationSteppers></ObservationSteppers> 
       <div className="card">
         <div className="card-header border-0 pt-5">
           <h3 className="card-title align-items-start flex-column">
