@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Recommendation from './Recommendation'
 import ActionsDisplay from './ActionsDisplay'
 import dayjs from 'dayjs'
+import {KTSVG} from '../../../../_metronic/helpers'
 import { 
   Accordion, 
   AccordionSummary, 
@@ -12,14 +13,14 @@ import {
   Typography
 } from '@mui/material'
 import { useIntl } from "react-intl"
-import { useLang } from "../../../_metronic/i18n/Metronici18n"
+import { useLang } from "../../../../_metronic/i18n/Metronici18n"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import CloseIcon from '@mui/icons-material/Close'
-import { HeaderLabels, LabelTextSemibold2 } from '../../modules/components/common/formsLabels/detailLabels'
+import { HeaderLabels, LabelTextSemibold2 } from '../../components/common/formsLabels/detailLabels'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ClearIcon from '@mui/icons-material/Clear';

@@ -2,26 +2,25 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Button, TextField, Box, Typography } from '@mui/material';
 import { Col, Modal, Row } from "react-bootstrap";
 import RecommendationDetails from './RecommendationDetails';
-import { generateUUID, writeToBrowserConsole } from '../../modules/utils/common';
+import { generateUUID, writeToBrowserConsole } from '../../utils/common';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { BtnLabelCanceltxtMedium2, BtnLabeltxtMedium2, HeaderLabels, InfoLabels } from '../../modules/components/common/formsLabels/detailLabels';
+import { BtnLabelCanceltxtMedium2, BtnLabeltxtMedium2, HeaderLabels, InfoLabels } from '../../components/common/formsLabels/detailLabels';
 import { useIntl } from 'react-intl';
-import DropdownList from '../../modules/components/dropdown/DropdownList';
-import { ILookup } from '../../models/global/globalGeneric';
-import { GetLookupValues } from '../../modules/services/adminSlice';
+import DropdownList from '../../components/dropdown/DropdownList';
+import { ILookup } from '../../../models/global/globalGeneric';
+import { GetLookupValues } from '../../services/adminSlice';
 import { 
     fetchRecommendationsByObservationId, 
     saveRecommendationForObservation, 
     updateRecommendationForObservation,
     deleteRecommendationForObservation,
     clearError
-} from '../../modules/services/recommendationSlice';
-import { useAppDispatch, useAppSelector } from '../../../store';
+} from '../../services/recommendationSlice';
+import { useAppDispatch, useAppSelector } from '../../../../store';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useLang } from '../../../_metronic/i18n/Metronici18n';
-import DropdownListInModal from '../../modules/components/dropdown/DropdownListInModal';
+import { useLang } from '../../../../_metronic/i18n/Metronici18n';
 interface RecommendationProps {
     observationId: string | number;
 }
@@ -77,8 +76,6 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
     // Debug logging
     console.log('Recommendation component rendered with recommendations:', recommendations.length, recommendations);
-    console.log('Dropdown options - Combot Function:', combotFunctionOptions.length, 'Level:', levelOptions.length);
-    console.log('Current values - combotFunction:', combotFunction, 'level:', level);
 
     // Fetch recommendations from API when component mounts or observationId changes
     useEffect(() => {
@@ -260,19 +257,16 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
 
     useEffect(() => {
         if (open) {
-            console.log('Modal opened, loading dropdown options...');
             // Load Combot Function options
             dispatch(GetLookupValues({ lookupType: "Domain" }))
                 .then(unwrapResult)
                 .then((originalPromiseResult) => {
                     if (originalPromiseResult.statusCode === 200) {
                         const response: ILookup[] = originalPromiseResult.data;
-                        console.log('Combot Function options loaded:', response);
                         setCombotFunctionOptions(response);
                     }
                 })
                 .catch((rejectedValueOrSerializedError) => {
-                    console.error('Error loading combot function options:', rejectedValueOrSerializedError);
                     writeToBrowserConsole(rejectedValueOrSerializedError);
                 });
 
@@ -282,12 +276,10 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                 .then((originalPromiseResult) => {
                     if (originalPromiseResult.statusCode === 200) {
                         const response: ILookup[] = originalPromiseResult.data;
-                        console.log('Level options loaded:', response);
                         setLevelOptions(response);
                     }
                 })
                 .catch((rejectedValueOrSerializedError) => {
-                    console.error('Error loading level options:', rejectedValueOrSerializedError);
                     writeToBrowserConsole(rejectedValueOrSerializedError);
                 });
         }
@@ -387,30 +379,20 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
             </div>
 
             <Box sx={{ mt: 2 }}>
-                 
 
-  <DropdownList
-                                    dataKey="lookupId"
-                                    dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
-                                    defaultText={intl.formatMessage({ id: "PLACEHOLDER.SELECT.LEVEL" })}
-                                    value={combotFunction}
-                                    data={levelOptions}
-                                   // setSelectedValue={(value) => formik.setFieldValue('level', value)}
-                                />
+
                 <Modal
-                     
-                   backdrop="static"
-                   keyboard={false}
+                    className="modal-sticky modal-sticky-lg modal-sticky-bottom-right"
+                    backdrop="static"
+                    keyboard={false}
                     centered
                     size="lg"
                     animation={false}
-                   enforceFocus={false}
-                   restoreFocus={false}
+                    enforceFocus={false}
                     dialogClassName="modal-dialog-scrollable"
                     aria-labelledby="contained-modal-title-vcenter"
                     show={open}
                     onHide={handleClose}
-                 
                 >
                     <Modal.Header closeButton>
                         <Modal.Title>
@@ -421,7 +403,7 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                             />
                         </Modal.Title>
                     </Modal.Header>
-                    <Modal.Body  >
+                    <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto', overflowX: 'hidden' }}>
                         {/* Title Field */}
                         <div className="col-12 mb-4">
                             <div className="row align-items-center">
@@ -461,22 +443,19 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                                     />
                                 </div>
                                 <div className="col-md-4">
-                                    <DropdownListInModal
-                                        className="w-100"
+                                    <DropdownList
+                                    className="w-100"
                                         dataKey="lookupId"
                                         dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
                                         defaultText={intl.formatMessage({ id: "PLACEHOLDER.SELECT.COMBOT_FUNCTION" })}
                                         value={combotFunction}
-                                        data={combotFunctionOptions || []}
+                                        data={combotFunctionOptions}
                                         setSelectedValue={(value) => {
-                                            console.log('Combot Function selected:', value);
                                             handleFieldChange('combotFunction', value);
                                             handleFieldBlur('combotFunction', value);
                                         }}
-                                        isClearable={true}
+                                        
                                     />
-
-                                   
                                     {touched.combotFunction && errors.combotFunction && (
                                         <div className="invalid-feedback d-block">{errors.combotFunction}</div>
                                     )}
@@ -489,19 +468,16 @@ const Recommendation: React.FC<RecommendationProps> = ({ observationId }) => {
                                     />
                                 </div>
                                 <div className="col-md-2">
-                                    <DropdownListInModal
-                                        className="w-100"
+                                    <DropdownList
                                         dataKey="lookupId"
                                         dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
                                         defaultText={intl.formatMessage({ id: "PLACEHOLDER.SELECT.LEVEL" })}
                                         value={level}
-                                        data={levelOptions || []}
+                                        data={levelOptions}
                                         setSelectedValue={(value) => {
-                                            console.log('Level selected:', value);
                                             handleFieldChange('level', value);
                                             handleFieldBlur('level', value);
                                         }}
-                                        isClearable={true}
                                     />
                                     {touched.level && errors.level && (
                                         <div className="invalid-feedback d-block">{errors.level}</div>

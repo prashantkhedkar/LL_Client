@@ -4,38 +4,40 @@ import * as Yup from 'yup';
 import { useIntl } from 'react-intl';
 import { useLang } from '../../../_metronic/i18n/Metronici18n';
 import { InfoLabels } from '../../modules/components/common/formsLabels/detailLabels';
-import DropdownList from '../../modules/components/dropdown/DropdownList';
-import PageHeader from '../../modules/components/common/PageHeader/PageHeader';
-import ContentSection from '../../modules/components/common/ContentSection/ContentSection';
-import { BtnLabeltxtMedium2, BtnLabelCanceltxtMedium2 } from '../../modules/components/common/formsLabels/detailLabels';
-import { writeToBrowserConsole } from '../../modules/utils/common';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { ILookup } from '../../models/global/globalGeneric';
-import { GetLookupValues } from '../../modules/services/adminSlice';
-import { useAppDispatch } from '../../../store';
-import { useAuth } from '../../modules/auth';
+import DropdownList from "../../modules/components/dropdown/DropdownList";
+import { writeToBrowserConsole } from "../../modules/utils/common";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { ILookup } from "../../models/global/globalGeneric";
+import { GetLookupValues } from "../../modules/services/adminSlice";
+import { useAppDispatch } from "../../../store";
+import { useAuth } from "../../modules/auth";
 
 interface ObservationFormProps {
   onSubmit: (values: ObservationFormData) => void;
   initialValues?: ObservationFormData;
-  mode?: 'add' | 'edit';
+  mode?: "add" | "edit";
   formikRef?: React.MutableRefObject<any>;
 }
 
 export interface ObservationFormData {
+  observationSubject: string;
   observationTitle: string;
-  discussion?: string;
-  conclusion?: string;
-  initialRecommendation?: string;
-  observationType?: number | null;
-  originatingType?: number | null;
-  level?: number | null;
-  currentAssignment?: string;
+  discussion: string;
+  conclusion: string;
+  initialRecommendation: string;
+  observationType: number;
+  originatingType: number;
+  level: number;
+  originatingMainUnit: number;
   status: number;
-  attachments?: File[];
 }
 
-const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValues, mode = 'add', formikRef }) => {
+const ObservationForm: React.FC<ObservationFormProps> = ({
+  onSubmit,
+  initialValues,
+  mode = "add",
+  formikRef,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [typeOptions, setTypeOptions] = useState<ILookup[]>([]);
   const [levelOptions, setLevelOptions] = useState<ILookup[]>([]);
@@ -43,109 +45,111 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
   const lang = useLang();
   const dispatch = useAppDispatch();
   const { auth } = useAuth();
-
-  // Debug logging to verify props
-  console.log('🔧 ObservationForm initialized with:', { 
-    hasOnSubmit: typeof onSubmit === 'function',
-    mode,
-    hasInitialValues: !!initialValues 
-  });
-
   useEffect(() => {
-        auth && console.log("Current User in ObservationForm: ", auth);
-      // Load Observation Types
-      dispatch(GetLookupValues({ lookupType: "ObservationType" }))
-        .then(unwrapResult)
-        .then((originalPromiseResult) => {
-          if (originalPromiseResult.statusCode === 200) {
-            const response: ILookup[] = originalPromiseResult.data;
-            setTypeOptions(response);
-          }
-        })
-        .catch((rejectedValueOrSerializedError) => {
-          writeToBrowserConsole(rejectedValueOrSerializedError);
-        });
+    auth && console.log("Current User in ObservationForm: ", auth);
+    // Load Observation Types
+    dispatch(GetLookupValues({ lookupType: "ObservationType" }))
+      .then(unwrapResult)
+      .then((originalPromiseResult) => {
+        if (originalPromiseResult.statusCode === 200) {
+          const response: ILookup[] = originalPromiseResult.data;
+          setTypeOptions(response);
+        }
+      })
+      .catch((rejectedValueOrSerializedError) => {
+        writeToBrowserConsole(rejectedValueOrSerializedError);
+      });
 
-      // Load Observation Level options
-      dispatch(GetLookupValues({ lookupType: "Level" }))
-        .then(unwrapResult)
-        .then((originalPromiseResult) => {
-          if (originalPromiseResult.statusCode === 200) {
-            const response: ILookup[] = originalPromiseResult.data;
-            setLevelOptions(response);
-          }
-        })
-        .catch((rejectedValueOrSerializedError) => {
-          writeToBrowserConsole(rejectedValueOrSerializedError);
-        });
-    
+    // Load Observation Level options
+    dispatch(GetLookupValues({ lookupType: "Level" }))
+      .then(unwrapResult)
+      .then((originalPromiseResult) => {
+        if (originalPromiseResult.statusCode === 200) {
+          const response: ILookup[] = originalPromiseResult.data;
+          setLevelOptions(response);
+        }
+      })
+      .catch((rejectedValueOrSerializedError) => {
+        writeToBrowserConsole(rejectedValueOrSerializedError);
+      });
   }, [dispatch]);
-
 
   const validationSchema = Yup.object({
     observationTitle: Yup.string()
-      .required(intl.formatMessage({ id: 'VALIDATION.OBSERVATION.TITLE.REQUIRED' }))
-      .max(256, intl.formatMessage({ id: 'VALIDATION.OBSERVATION.TITLE.MAX_LENGTH' })),
+      .required(
+        intl.formatMessage({ id: "VALIDATION.OBSERVATION.TITLE.REQUIRED" })
+      )
+      .max(
+        256,
+        intl.formatMessage({ id: "VALIDATION.OBSERVATION.TITLE.MAX_LENGTH" })
+      ),
+    observationSubject: Yup.string()
+      .required(
+        intl.formatMessage({ id: "VALIDATION.OBSERVATION.SUBJECT.REQUIRED" })
+      )
+      .max(
+        256,
+        intl.formatMessage({ id: "VALIDATION.OBSERVATION.SUBJECT.MAX_LENGTH" })
+      ),
     discussion: Yup.string()
-      .required(intl.formatMessage({ id: 'VALIDATION.DISCUSSION.REQUIRED' }))
-      .max(50, 'Discussion must be less than 50 characters'),
+      .required(intl.formatMessage({ id: "VALIDATION.DISCUSSION.REQUIRED" }))
+      .max(50, "Discussion must be less than 50 characters"),
     conclusion: Yup.string()
-      .required(intl.formatMessage({ id: 'VALIDATION.CONCLUSION.REQUIRED' }))
-      .max(50, 'Conclusion must be less than 50 characters'),
+      .required(intl.formatMessage({ id: "VALIDATION.CONCLUSION.REQUIRED" }))
+      .max(50, "Conclusion must be less than 50 characters"),
     initialRecommendation: Yup.string()
-      .required(intl.formatMessage({ id: 'VALIDATION.INITIAL.RECOMMENDATION.REQUIRED' }))
-      .max(50, 'Initial recommendation must be less than 50 characters'),
-    currentAssignment: Yup.string()
-      .max(128, 'Current assignment must be less than 128 characters'),
-    observationType: Yup.number()
-      .nullable()
-      .required('Please select an observation type')
-      .min(1, 'Please select an observation type'),
-    level: Yup.number()
-      .nullable()
-      .required('Please select a level')
-      .min(1, 'Please select a level'),
+      .required(
+        intl.formatMessage({ id: "VALIDATION.INITIAL.RECOMMENDATION.REQUIRED" })
+      )
+      .max(50, "Initial recommendation must be less than 50 characters"),
+    type: Yup.string()
+      .required(intl.formatMessage({ id: "VALIDATION.TYPE.REQUIRED" }))
+      .max(64, intl.formatMessage({ id: "VALIDATION.TYPE.MAX_LENGTH" })),
+    level: Yup.string()
+      .required(intl.formatMessage({ id: "VALIDATION.LEVEL.REQUIRED" }))
+      .max(64, intl.formatMessage({ id: "VALIDATION.LEVEL.MAX_LENGTH" })),
+    originatingMainUnit: Yup.string()
+      .required(
+        intl.formatMessage({ id: "VALIDATION.ORIGINATING.MAIN.UNIT.REQUIRED" })
+      )
+      .max(
+        128,
+        intl.formatMessage({
+          id: "VALIDATION.ORIGINATING.MAIN.UNIT.MAX_LENGTH",
+        })
+      ),
   });
 
   const formik = useFormik({
     initialValues: initialValues || {
-      observationTitle: '',
-      discussion: '',
-      conclusion: '',
-      initialRecommendation: '',
-      observationType: null,
-      originatingType: null,
-      level: null,
-      currentAssignment: '',
+      observationSubject: "",
+      observationTitle: "",
+      discussion: "",
+      conclusion: "",
+      initialRecommendation: "",
+      observationType: 0,
+      originatingType: 0,
+      level: 0,
+      originatingMainUnit: 0,
       status: 0,
-      attachments: [],
     },
     validationSchema,
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values) => {
-      console.log('📋 Formik onSubmit called with values:', values);
       setIsLoading(true);
       try {
-        console.log('🔄 Calling parent onSubmit handler...');
         await onSubmit(values);
-        console.log('✅ Parent onSubmit completed successfully');
-      } catch (error) {
-        console.error('❌ Error in parent onSubmit:', error);
       } finally {
         setIsLoading(false);
-        console.log('🏁 Form submission completed');
       }
     },
   });
 
   // Expose formik instance to parent component
-  useEffect(() => {
-    if (formikRef) {
-      formikRef.current = formik;
-      console.log('🔗 Formik ref set:', formikRef.current);
-    }
-  }, [formikRef, formik]);
+  if (formikRef) {
+    formikRef.current = formik;
+  }
 
   return (
     <form onSubmit={formik.handleSubmit} className="article-form rtl-form">
@@ -162,17 +166,48 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
             <div className="col-md-10">
               <input
                 type="text"
-                autoComplete='off'
+                autoComplete="off"
                 className="form-control form-control-solid active input5 lbl-txt-medium-2"
                 placeholder={intl.formatMessage({
                   id: "PLACEHOLDER.OBSERVATION.TITLE",
                 })}
-                {...formik.getFieldProps('observationTitle')}
+                {...formik.getFieldProps("observationTitle")}
                 dir={lang === "ar" ? "rtl" : "ltr"}
               />
-              {formik.touched.observationTitle && formik.errors.observationTitle && (
-                <div className="error">{formik.errors.observationTitle}</div>
-              )}
+              {formik.touched.observationTitle &&
+                formik.errors.observationTitle && (
+                  <div className="error">{formik.errors.observationTitle}</div>
+                )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 mb-4">
+          <div className="row align-items-center">
+            <div className="col-md-2">
+              <InfoLabels
+                style={{}}
+                text={intl.formatMessage({ id: "LABEL.OBSERVATION.SUBJECT" })}
+                isRequired={true}
+              />
+            </div>
+            <div className="col-md-10">
+              <input
+                type="text"
+                autoComplete="off"
+                placeholder={intl.formatMessage({
+                  id: "PLACEHOLDER.OBSERVATION.SUBJECT",
+                })}
+                className="form-control form-control-solid active input5 lbl-txt-medium-2"
+                {...formik.getFieldProps("observationSubject")}
+                dir={lang === "ar" ? "rtl" : "ltr"}
+              />
+              {formik.touched.observationSubject &&
+                formik.errors.observationSubject && (
+                  <div className="error">
+                    {formik.errors.observationSubject}
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -190,14 +225,19 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
               <DropdownList
                 dataKey="lookupId"
                 dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
-                defaultText={intl.formatMessage({ id: "PLACEHOLDER.SELECT.TYPE" })}
+                defaultText={intl.formatMessage({
+                  id: "PLACEHOLDER.SELECT.TYPE",
+                })}
                 value={formik.values.observationType}
                 data={typeOptions}
-                setSelectedValue={(value) => formik.setFieldValue('observationType', value)}
+                setSelectedValue={(value) =>
+                  formik.setFieldValue("observationType", value)
+                }
               />
-              {formik.touched.observationType && formik.errors.observationType && (
-                <div className="error">{formik.errors.observationType}</div>
-              )}
+              {formik.touched.observationType &&
+                formik.errors.observationType && (
+                  <div className="error">{formik.errors.observationType}</div>
+                )}
             </div>
             <div className="col-md-2">
               <InfoLabels
@@ -210,17 +250,21 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
               <DropdownList
                 dataKey="lookupId"
                 dataValue={lang === "ar" ? "lookupNameAr" : "lookupName"}
-                defaultText={intl.formatMessage({ id: "PLACEHOLDER.SELECT.LEVEL" })}
+                defaultText={intl.formatMessage({
+                  id: "PLACEHOLDER.SELECT.LEVEL",
+                })}
                 value={formik.values.level}
                 data={levelOptions}
-                setSelectedValue={(value) => formik.setFieldValue('level', value)}
+                setSelectedValue={(value) =>
+                  formik.setFieldValue("level", value)
+                }
               />
               {formik.touched.level && formik.errors.level && (
                 <div className="error">{formik.errors.level}</div>
               )}
             </div>
           </div>
-        </div>  
+        </div>
 
         <div className="col-12 mb-4">
           <div className="row">
@@ -237,7 +281,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
                 placeholder={intl.formatMessage({
                   id: "PLACEHOLDER.DISCUSSION",
                 })}
-                {...formik.getFieldProps('discussion')}
+                {...formik.getFieldProps("discussion")}
                 rows={4}
                 dir={lang === "ar" ? "rtl" : "ltr"}
               />
@@ -263,7 +307,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
                 placeholder={intl.formatMessage({
                   id: "PLACEHOLDER.CONCLUSION",
                 })}
-                {...formik.getFieldProps('conclusion')}
+                {...formik.getFieldProps("conclusion")}
                 rows={4}
                 dir={lang === "ar" ? "rtl" : "ltr"}
               />
@@ -279,7 +323,9 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.INITIAL.RECOMMENDATION" })}
+                text={intl.formatMessage({
+                  id: "LABEL.INITIAL.RECOMMENDATION",
+                })}
                 isRequired={true}
               />
             </div>
@@ -289,13 +335,16 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
                 placeholder={intl.formatMessage({
                   id: "PLACEHOLDER.INITIAL.RECOMMENDATION",
                 })}
-                {...formik.getFieldProps('initialRecommendation')}
+                {...formik.getFieldProps("initialRecommendation")}
                 rows={4}
                 dir={lang === "ar" ? "rtl" : "ltr"}
               />
-              {formik.touched.initialRecommendation && formik.errors.initialRecommendation && (
-                <div className="error">{formik.errors.initialRecommendation}</div>
-              )}
+              {formik.touched.initialRecommendation &&
+                formik.errors.initialRecommendation && (
+                  <div className="error">
+                    {formik.errors.initialRecommendation}
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -304,8 +353,8 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
             <div className="col-md-2">
               <InfoLabels
                 style={{}}
-                text={intl.formatMessage({ id: "LABEL.CURRENT.ASSIGNMENT" })}
-                isRequired={false}
+                text={intl.formatMessage({ id: "LABEL.ORIGINATING.MAIN.UNIT" })}
+                isRequired={true}
               />
             </div>
             <div className="col-md-4">
@@ -313,14 +362,17 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onSubmit, initialValu
                 type="text"
                 className="form-control form-control-solid active input5 lbl-txt-medium-2"
                 placeholder={intl.formatMessage({
-                  id: "PLACEHOLDER.CURRENT.ASSIGNMENT",
+                  id: "PLACEHOLDER.ORIGINATING.MAIN.UNIT",
                 })}
-                {...formik.getFieldProps('currentAssignment')}
+                {...formik.getFieldProps("originatingMainUnit")}
                 dir={lang === "ar" ? "rtl" : "ltr"}
               />
-              {formik.touched.currentAssignment && formik.errors.currentAssignment && (
-                <div className="error">{formik.errors.currentAssignment}</div>
-              )}
+              {formik.touched.originatingMainUnit &&
+                formik.errors.originatingMainUnit && (
+                  <div className="error">
+                    {formik.errors.originatingMainUnit}
+                  </div>
+                )}
             </div>
           </div>
         </div>

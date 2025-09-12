@@ -5724,7 +5724,7 @@ fieldset:disabled .btn {
   --bs-card-subtitle-color: ;
   --bs-card-border-width: 1px;
   --bs-card-border-color: var(--bs-border-color);
-  --bs-card-border-radius: 0.75rem;
+  --bs-card-border-radius: .5rem;
   --bs-card-box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.03);
   --bs-card-inner-border-radius: calc(0.625rem - 1px);
   --bs-card-cap-padding-y: 0.5rem;
