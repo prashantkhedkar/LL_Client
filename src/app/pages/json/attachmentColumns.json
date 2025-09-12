@@ -1,0 +1,50 @@
+[ 
+    {
+        "columnName": "MOD.MANAGESETTING.BACKGROUND.BACKGROUNDNAME",
+        "dataColumnName": "title",
+      "sortable": false,
+      "type": "string",
+      "className": "cellText",
+      "fontAwesome": "",
+      "isSearchable": false,
+      "width": "40%",
+      "width-ar": "40%",
+      "style": {
+        "padding-right": "7px",
+        "padding-left": "7px"
+      }
+    },
+    
+    {
+        "columnName": "MOD.SETTINGS.BACKGROUND.ENDDATE",
+        "dataColumnName": "fileName",
+      "sortable": false,
+      "type": "string",
+      "className": "cellText",
+      "fontAwesome": "",
+      "isSearchable": false,
+      "width": "20%",
+      "width-ar": "20%",
+      "style": {
+        "padding-right": "7px",
+        "padding-left": "7px"
+      }
+    },
+    
+    {
+      "columnName": "MENU.SETTINGS.BACKGROUND.ACTIONS",
+      "dataColumnName": "",
+      "sortable": false,
+      "type": "link",
+      "className": "cellText",
+      "fontAwesome": "faEdit",
+      "showTooltip": "false",
+      "isSearchable": false,
+      "width": "10%",
+      "style": {
+        "padding-right": "2px",
+        "padding-left": "7px",
+        "color": "grey"
+      }
+    }
+  ]
